@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* :root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
+@theme inline {
+  --font-great: var(--font-great-vibes);
+  --font-dancing-script: var(--font-dancing-script);
+  --font-roboto: var(--font-roboto);
+}
+
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-tl: 40rem;
+  --breakpoint-lt: 64rem;
+}
+
+body {
+  /* background: var(--background);
+  color: var(--foreground); */
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/*Begin Custom scrollbar */
+body::-webkit-scrollbar-thumb {
+  background-image: linear-gradient(-45deg, #6a5af9, #d66efd);
+  border-radius: 50px;
+}
+body::-webkit-scrollbar-track {
+  background-color: #fafafa;
+}
+body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-image: linear-gradient(
+    -180deg,
+    oklch(72.3% 0.219 149.579),
+    oklch(64.5% 0.246 16.439),
+    oklch(62.3% 0.214 259.815)
+  );
+  border-radius: 50px;
+}
+.scrollbar-custom::-webkit-scrollbar-track {
+  background-color: #ccc;
+}
+.scrollbar-custom::-webkit-scrollbar {
+  width: 3px;
+}
+/*End Custom scrollbar */
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-type-icon.active {
+  transition: transform 0.3s ease;
+  transform: rotate(180deg);
+}
+
+.filter-options {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.filter-options.show {
+  grid-template-rows: 1fr;
+}
+
+.login-box {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.nav-link-mana.active {
+  cursor: inherit;
+  font-weight: 700;
+  box-shadow: 0 1px 4px 0 rgba(255, 255, 255, 0.8),
+    0 1px 2px -1px rgba(255, 255, 255, 0.1);
+}
+
+.loader {
+  width: 3.5em;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.loader > span {
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 50%;
+  background-color: #ff3e00;
+  animation: fade 0.8s ease-in-out alternate infinite;
+}
+
+.loader > span:nth-of-type(1) {
+  animation-delay: -0.4s;
+}
+
+.loader > span:nth-of-type(2) {
+  animation-delay: -0.2s;
+}
+
+@keyframes fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.ql-editor .ql-align-center img {
+  display: block;
+  margin: 0 auto;
+}
+
+.image-shadow {
+  filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 2px #fff)
+    drop-shadow(0 0 3px #fff);
+}
