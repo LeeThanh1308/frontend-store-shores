@@ -1,49 +1,95 @@
 "use client";
 
-import { handleConvertPrice } from "@/services/utils";
 import { ConfigProvider, Rate } from "antd";
-import { useState } from "react";
 import { FaRegHeart, FaStar } from "react-icons/fa";
-import { GoHeartFill } from "react-icons/go";
+import { generateUrlImage, handleConvertPrice } from "@/services/utils";
 
-function ProductItem({ isLike = false, brand = "", name = "" }) {
-  const [Like, setIsLike] = useState(isLike);
+import { GoHeartFill } from "react-icons/go";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+
+function ProductItem({ showTypes = false, data = {}, key = "" }) {
+  const [imageActive, setImageActive] = useState(0);
+
   return (
-    <div className="font-dancing-script text-rose-500 text-xl rounded-xl bg-white shadow-md hover:shadow-lg shadow-black/25 p-3 transition-shadow space-y-2 relative overflow-hidden">
-      <div className=" absolute top-0 left-0 px-3 py-0.5 z-20 bg-rose-500 rounded-br-xl text-sm font-roboto font-bold text-white">
-        20%
-      </div>
-      {/* Hình ảnh sản phẩm */}
-      <div className="relative w-full aspect-square rounded-lg overflow-hidden">
-        <div
-          className="absolute top-2 right-2 cursor-pointer rounded-full p-1 transition"
-          onClick={() => setIsLike(!Like)}
-        >
-          {Like ? (
-            <GoHeartFill className="text-rose-500" size={20} />
-          ) : (
-            <FaRegHeart className="text-gray-500" size={20} />
+    <div
+      key={key}
+      className="font-dancing-script flex flex-col text-rose-500 text-xl rounded-xl bg-white shadow-md hover:shadow-lg shadow-black/25 transition-shadow space-y-2 relative overflow-hidden"
+    >
+      {Number(data?.discount) > 0 && (
+        <div className=" absolute top-0 left-0 px-3 py-0.5 z-20 bg-rose-500 rounded-br-xl text-sm font-roboto font-bold text-white">
+          {data?.discount}%
+        </div>
+      )}
+      <Link
+        className=" h-full flex flex-col justify-between p-3"
+        href={`/products/${data?.slug}`}
+      >
+        {/* Hình ảnh sản phẩm */}
+        <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+          <Image
+            src={`${generateUrlImage(
+              showTypes
+                ? data?.colors[imageActive]?.images?.[0]?.src
+                : data?.images?.[0].src
+            )}`}
+            alt="image products"
+            layout="fill"
+          />
+
+          {showTypes && (
+            <div
+              className="absolute bottom-1 right-0 left-0 m-auto"
+              onClick={(e) => e.preventDefault()}
+            >
+              <div className="flex justify-center gap-2">
+                {data?.colors?.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`h-8 w-8 rounded-md overflow-hidden relative text-shadow ${
+                      imageActive == index && "border border-black"
+                    }`}
+                    onClick={() => {
+                      setImageActive(index);
+                    }}
+                  >
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_DOMAIN_API}${process.env.NEXT_PUBLIC_PARAM_GET_FILE_API}${_?.images?.[0]?.src}`}
+                      alt="image"
+                      layout="fill"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
-      </div>
 
-      {/* Thông tin sản phẩm */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-700">{brand}</h2>
-        <div className="flex items-center gap-1">
-          <span className="text-lg font-medium text-gray-700">5</span>
-          <FaStar size={14} className="text-rose-500" />
+        {/* Thông tin sản phẩm */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-700">
+            {data?.brand?.name}
+          </h2>
+          <div className="flex items-center gap-1">
+            {/* <span className="text-lg font-medium text-gray-700">5</span>
+          <FaStar size={14} className="text-rose-500" /> */}
+          </div>
         </div>
-      </div>
 
-      <p className="text-gray-800 line-clamp-3">{name}</p>
+        <p className="text-gray-800 line-clamp-3">{data?.name}</p>
 
-      {/* Giá sản phẩm */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-red-500">
-          {handleConvertPrice(500000000)}
-        </h2>
-      </div>
+        {/* Giá sản phẩm */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-red-500">
+            {handleConvertPrice(
+              data?.sizes?.sellingPrice
+                ? data?.sizes?.sellingPrice
+                : data?.sellingPrice
+            )}
+          </h2>
+        </div>
+      </Link>
     </div>
   );
 }

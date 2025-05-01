@@ -23,7 +23,6 @@ import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import { SearchOutlined } from "@ant-design/icons";
 import { colorsSchema } from "@/services/schema/colorsSchema";
 import { handleRegexSlug } from "@/services/utils";
-import { record } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -312,7 +311,7 @@ function Colors() {
           <div className=" grid grid-cols-8">
             <Button
               type="primary"
-              disabled={idsSelectedRows.length == 0}
+              disabled={idsSelectedRows?.length == 0}
               onClick={() => {
                 console.log(idsSelectedRows);
                 if (window.confirm("Bạn chắc chắn muốn xóa màu sắc đã chọn?"))

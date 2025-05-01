@@ -1,22 +1,50 @@
 "use client";
 
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useLayoutEffect, useState } from "react";
+
+import { Button } from "antd";
 import Link from "next/link";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { authSelector } from "@/services/redux/Slices/auth";
+import { handleCreateAccountVerify } from "@/services/redux/Slices/auth/registerApi";
+import { redirect } from "next/navigation";
 import { registerSchema } from "@/services/schema/registerSchema";
+import { useForm } from "react-hook-form";
+import { useGuestOnly } from "@/components/auth/useAuthRedirect";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 function Regsister() {
+  const { validators, activeVerifyCodeSignID } = useSelector(authSelector);
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
+    clearErrors,
+    reset,
+    setError,
   } = useForm({
     resolver: zodResolver(registerSchema),
   });
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    dispatch(handleCreateAccountVerify(data));
+  };
+
+  useLayoutEffect(() => {
+    if (Number(activeVerifyCodeSignID)) {
+      redirect("/verify-code");
+    }
+  }, [activeVerifyCodeSignID]);
+
+  useEffect(() => {
+    Object.entries(validators).forEach(([field, message]) => {
+      setError(field, { type: "server", message });
+    });
+  }, [validators]);
   console.log(errors);
   return (
     <div className="w-full h-screen flex text-center relative">
@@ -24,7 +52,11 @@ function Regsister() {
         <div>
           <div className=" w-20 h-20 mx-auto">
             <Link href="/" className="">
-              <img src={"/images/logo.png"} className="w-full h-full" alt="" />
+              <img
+                src={"/images/logo.png"}
+                className="w-full h-full image-shadow"
+                alt=""
+              />
             </Link>
           </div>
           <h2 className="text-3xl text-rose-700">Đăng ký tài khoản.</h2>
@@ -33,15 +65,15 @@ function Regsister() {
               <div className="mb-2 w-full mr-1">
                 <input
                   type="text"
-                  name="username"
+                  name="fullname"
                   placeholder="Họ và tên"
                   className={`p-2 rounded-md w-full border border-solid border-white outline-none placeholder:text-rose-700 bg-slate-50/0 ${
-                    !errors.username?.message ? null : "!border-red-500"
+                    !errors.fullname?.message ? null : "!border-red-500"
                   }`}
-                  {...register("username")}
+                  {...register("fullname")}
                 />
                 <p className="text-rose-700 indent-1 warn w-full mb-1 text-start text-sm">
-                  {errors.username?.message}
+                  {errors.fullname?.message}
                 </p>
               </div>
 
@@ -91,17 +123,19 @@ function Regsister() {
                     }`}
                     {...register("password")}
                   />
-                  {showPassword ? (
-                    <i
-                      className="fa-solid fa-eye absolute right-2 top-3"
-                      onClick={(e) => setShowPassword(!showPassword)}
-                    ></i>
-                  ) : (
-                    <i
-                      className="fa-regular fa-eye-slash absolute right-2 top-3"
-                      onClick={(e) => setShowPassword(!showPassword)}
-                    ></i>
-                  )}
+                  <div className="absolute right-3 top-0 bottom-0 flex items-center cursor-pointer">
+                    {showPassword ? (
+                      <FaEye
+                        className="image-shadow"
+                        onClick={(e) => setShowPassword(!showPassword)}
+                      />
+                    ) : (
+                      <FaEyeSlash
+                        className="image-shadow"
+                        onClick={(e) => setShowPassword(!showPassword)}
+                      />
+                    )}
+                  </div>
 
                   <p className="text-rose-700 indent-1 warn w-full mb-1 text-start text-sm">
                     {errors.password?.message}
@@ -182,4 +216,4 @@ function Regsister() {
   );
 }
 
-export default Regsister;
+export default useGuestOnly(Regsister);

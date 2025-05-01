@@ -1,75 +1,43 @@
 "use client";
 
+import {
+  authSelector,
+  handleChangeStateActiveVerify,
+  handleRefreshOtpCode,
+  handleVerifyOtpCode,
+} from "@/services/redux/Slices/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+
 import FormOtp from "@/components/sections/FormOtp";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-function VerifyCode() {
-  const [data, setData] = useState({
-    email: "",
-    total: "",
-    expRefreshToken: "",
-    expVerify: "",
-  });
-  const [timeVerify, setTimeVerify] = useState();
-  const [isLoading, setIsLoading] = useState(true);
+import { formartHouseMinutesSeconds } from "@/services/utils";
+import { redirect } from "next/navigation";
+import { useGuestOnly } from "@/components/auth/useAuthRedirect";
 
-  //   useEffect(() => {
-  //     setIsLoading(true);
-  //     const verifyID = Cookies.get("tokenID");
-  //     if (verifyID) {
-  //       HttpRequest.get("verifications/checkVerify/" + verifyID)
-  //         .then((data) => data.data)
-  //         .then((data) => {
-  //           if (data) {
-  //             const { expVerify, ...args } = data;
-  //             setData(args);
-  //             setTimeVerify(expVerify);
-  //           }
-  //         })
-  //         .catch((error) => {
-  //           if (error.response.status === 404) {
-  //             Cookies.remove("tokenID");
-  //             navigate("/signup");
-  //           }
-  //         })
-  //         .finally(() => {
-  //           setIsLoading(false);
-  //         });
-  //     } else {
-  //       navigate("/signup");
-  //     }
-  //   }, []);
+function VerifyCode() {
+  const dispatch = useDispatch();
+  const { activeVerifyCodeSignID, dataVerifyCode } = useSelector(authSelector);
+  const [timeVerify, setTimeVerify] = useState();
+  const [timeExpCode, setTimeExpCode] = useState({
+    expRefreshToken: 0,
+    dateExpVerify: 0,
+  });
 
   const handleVerifyResult = async (code) => {
-    const verifyID = await Cookies.get("tokenID");
-    // if (code && verifyID) navigate(`/verify/${verifyID}/${code}`);
+    await dispatch(handleVerifyOtpCode({ id: activeVerifyCodeSignID, code }));
+    redirect("/redirect");
   };
 
   const handleRefreshCode = async () => {
-    setIsLoading(true);
-    const verifyID = await Cookies.get("tokenID");
-    // HttpRequest.get("verifications/refresh/" + verifyID)
-    //   .then((response) => response.data)
-    //   .then((data) => {
-    //     if (data.message && data.data) {
-    //       Toastify(1, data.message);
-    //       const { expVerify, ...args } = data.data;
-    //       setData(args);
-    //       setTimeVerify(expVerify);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     Toastify(0, error.response.data.message);
-    //   })
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //   });
+    dispatch(handleRefreshOtpCode(activeVerifyCodeSignID));
   };
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      if (timeVerify <= 0) {
-        navigate("/signup");
+      if (timeVerify <= 0 && activeVerifyCodeSignID && dataVerifyCode?.email) {
+        dispatch(handleChangeStateActiveVerify(false));
+        redirect("/login");
       }
       if (timeVerify) {
         setTimeVerify(timeVerify - 1);
@@ -79,15 +47,27 @@ function VerifyCode() {
     return () => clearTimeout(timerId);
   }, [timeVerify]);
 
-  function formartHouseMinutesSeconds(seconds) {
-    const house = Math.floor(seconds / 60 / 60);
-    const minutes = Math.floor(seconds / 60 - house * 60);
-    const second = seconds % 60;
+  useEffect(() => {
+    if (!activeVerifyCodeSignID) {
+      redirect("/login");
+    }
+  }, [activeVerifyCodeSignID]);
 
-    return `${house < 10 ? "0" + house : house}:${
-      minutes < 10 ? "0" + minutes : minutes
-    }:${second < 10 ? "0" + second : second}`;
-  }
+  useEffect(() => {
+    const currentTime = new Date().getTime();
+    const { expRefreshToken, expVerify } = dataVerifyCode;
+    const dateExpRefresh = Math.floor(
+      (new Date(expRefreshToken).getTime() - currentTime) / 1000
+    );
+    const dateExpVerify = Math.floor(
+      (new Date(expVerify).getTime() - currentTime) / 1000
+    );
+    setTimeExpCode({
+      expRefreshToken: dateExpRefresh,
+      dateExpVerify: dateExpVerify,
+    });
+    setTimeVerify(dateExpVerify);
+  }, [dataVerifyCode]);
 
   return (
     <div className="w-full h-screen flex text-center relative font-great font-bold">
@@ -97,14 +77,18 @@ function VerifyCode() {
 
           {/* </div> */}
           <div className="mt-4 w-20 h-20 mx-auto">
-            <img src={`/images/logo.png`} className="w-full h-full" alt="" />
+            <img
+              src={`/images/logo.png`}
+              className="w-full h-full image-shadow"
+              alt=""
+            />
           </div>
 
           <h2 className="text-3xl">Xác minh tài khoản.</h2>
-          <p className=" text-lg font-thin text-black mt-1">
+          <p className=" text-lg font-thin text-black mt-1 image-shadow">
             Nhập mã xác minh gồm 6 chữ số mà chúng tôi đã gửi tới email{" "}
-            {data.email} của bạn, mã sẽ hết hạn sau
-            <span className="text-green-500 font-bold text-sm">
+            {dataVerifyCode.email} của bạn, mã sẽ hết hạn sau
+            <span className="text-green-500 font-bold text-sm font-roboto">
               {" "}
               {formartHouseMinutesSeconds(timeVerify ? timeVerify : 0)}
             </span>
@@ -117,14 +101,14 @@ function VerifyCode() {
               classx={" m-2"}
               getValue={handleVerifyResult}
               clickRefresh={handleRefreshCode}
-              totalVerify={3}
-              expRefresh={data.expRefreshToken}
+              totalVerify={dataVerifyCode?.total}
+              expRefresh={timeExpCode.expRefreshToken}
               onEnter={(code) => handleVerifyResult(code)}
             />
           </div>
 
           <div className="mt-3 py-1">
-            <p className="text-sm cursor-default">
+            <p className="text-sm cursor-default image-shadow">
               Bạn đã có tài khoản?{" "}
               <Link href="/login">
                 <span className="text-blue-500 cursor-pointer">Đăng nhập.</span>
@@ -137,4 +121,4 @@ function VerifyCode() {
   );
 }
 
-export default VerifyCode;
+export default useGuestOnly(VerifyCode);

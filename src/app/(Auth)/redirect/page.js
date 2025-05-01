@@ -1,67 +1,56 @@
 "use client";
 
+import {
+  authSelector,
+  handleChangeStateActiveVerify,
+} from "@/services/redux/Slices/auth";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useLayoutEffect, useState } from "react";
+
 import { FaCircleCheck } from "react-icons/fa6";
+import { handleGetInfoVerifyCodeSign } from "@/services/redux/Slices/auth/registerApi";
+import { redirect } from "next/navigation";
+import { useGuestOnly } from "@/components/auth/useAuthRedirect";
+
 function VerifyEmail() {
-  // const { id, code } = useParams();
-  const [isSuccess, setIsSuccess] = useState(true);
+  const dispatch = useDispatch();
+  const { statusVerify, activeVerifyCodeSignID } = useSelector(authSelector);
   const [count, setCount] = useState(3);
-  const [message, setMessage] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  useLayoutEffect(() => {
+    const TimeId = setInterval(() => {
+      if (statusVerify?.message) {
+        setCount((prev) => {
+          if (prev <= 1) {
+            setCount(0);
+            clearInterval(TimeId);
+            if (statusVerify?.state) {
+              dispatch(handleChangeStateActiveVerify(undefined));
+              redirect("/login");
+            } else {
+              dispatch(handleGetInfoVerifyCodeSign(activeVerifyCodeSignID));
+              redirect("/register");
+            }
+          } else {
+            return prev - 1;
+          }
+        });
+      } else {
+        clearInterval(TimeId);
+      }
+    }, 1000);
 
-  // useLayoutEffect(() => {
-  //   setIsLoading(true);
-  // HttpRequest.post(`verifications/accounts/${id}/${code}`)
-  //   .then((data) => data.data)
-  //   .then((data) => {
-  //     setMessage(data.message);
-  //     Cookies.remove("tokenID");
-  //     setIsSuccess(true);
-  //   })
-  //   .catch((err) => {
-  //     setIsSuccess(false);
-  //     setMessage(err?.response?.data?.message);
-  //   })
-  //   .finally(() => {
-  //     setTimeout(() => {
-  //       setIsLoading(false);
-  //     }, 200);
-  //   });
-  // }, [id, code]);
-
-  // useLayoutEffect(() => {
-  //   const TimeId = setInterval(() => {
-  //     if (message) {
-  //       setCount((prev) => {
-  //         if (prev <= 1) {
-  //           setCount(0);
-  //           clearInterval(TimeId);
-  //           if (isSuccess) {
-  //             navigate("/login");
-  //           } else {
-  //             navigate("/signup");
-  //           }
-  //         } else {
-  //           return prev - 1;
-  //         }
-  //       });
-  //     } else {
-  //       clearInterval(TimeId);
-  //     }
-  //   }, 1000);
-
-  //   return () => clearInterval(TimeId);
-  // }, [message]);
+    return () => clearInterval(TimeId);
+  }, [statusVerify?.message]);
 
   return (
     <div className="w-full h-screen flex justify-center items-center">
-      {isSuccess ? (
+      {statusVerify.state ? (
         <div className="w-96 h-64 border shadow-md rounded-md text-emerald-600 flex justify-center items-center text-center">
           <div>
             <div className="flex justify-center mb-2">
               <FaCircleCheck className=" text-5xl" />
             </div>
-            <h1 className=" text-xl font-bold">{message}</h1>
+            <h1 className=" text-xl font-bold">{statusVerify?.message}</h1>
             <p className="text-sm">
               Hệ thống sẽ chuyển sang trang đăng nhập sau {count}s.
             </p>
@@ -73,7 +62,7 @@ function VerifyEmail() {
             <div className="flex justify-center mb-2">
               <FaCircleCheck className=" text-5xl" />
             </div>
-            <h1 className=" text-xl font-bold">{message}</h1>
+            <h1 className=" text-xl font-bold">{statusVerify?.message}</h1>
             <p className="text-sm">
               Hệ thống sẽ chuyển sang trang verify {count}s.
             </p>
@@ -84,4 +73,4 @@ function VerifyEmail() {
   );
 }
 
-export default VerifyEmail;
+export default useGuestOnly(VerifyEmail);

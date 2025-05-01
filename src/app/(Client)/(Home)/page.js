@@ -1,8 +1,20 @@
 "use client";
 
+import {
+  bootstrapReducer,
+  bootstrapSelector,
+  handleGetProductBrands,
+  handleGetTrendingProducts,
+} from "@/services/redux/Slices/bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+
+import Image from "next/image";
+import ProductSection from "@/components/sections/ProductSection";
 import Responsive from "@/components/layout/Responsive";
-import ProductItem from "@/components/sections/ProductItem";
 import SliderShowImage from "@/components/sections/SliderShowImage/SliderShowImage";
+import { generateUrlImage } from "@/services/utils";
+
 const ImageStore = [
   "/slides/vutru1.webp",
   "/slides/coder.webp",
@@ -21,29 +33,59 @@ const ImageStore = [
   "/slides/vutru.webp",
 ];
 function Page() {
+  const dispatch = useDispatch();
+  const { trendings, productBrands } = useSelector(bootstrapSelector);
+  const [activeImage, setActiveImage] = useState(0);
+  useEffect(() => {
+    if (trendings?.products?.length == 0) {
+      dispatch(handleGetTrendingProducts());
+    }
+    if (productBrands?.length == 0) {
+      dispatch(handleGetProductBrands());
+    }
+  }, []);
   return (
     <div>
       <Responsive>
-        <div className=" w-full h-[80vh] relative z-10">
-          <SliderShowImage data={ImageStore} />
-        </div>
-
-        <div className=" mt-8 min-h-screen">
-          <div className=" flex items-center justify-center">
-            <div className="h-0.5 flex-[0.3] bg-rose-700"></div>
-            <h2 className=" shrink-0 font-great font-bold text-3xl text-center text-rose-700 px-8">
-              Sản phẩm bán chạy
-            </h2>
-            <div className="h-0.5 flex-[0.3] bg-rose-700"></div>
-          </div>
-
-          <div className=" grid grid-cols-5 gap-3">
-            <ProductItem
-              brand="Nike"
-              name="Giày Nike Air Jordan 1 Retro Low OG ‘Mocha’ [CZ0858 102]"
+        <div className=" w-full h-[40vh] relative z-10 flex justify-between gap-1 mt-3">
+          <div className="w-3/4 relative rounded-sm overflow-hidden h-full">
+            <SliderShowImage
+              data={ImageStore}
+              speed={5000}
+              onActiveImage={setActiveImage}
             />
           </div>
+          <div className="w-1/4 flex flex-col gap-1">
+            <div className=" flex-1 w-full rounded-sm bg-black overflow-hidden relative">
+              <Image
+                src={
+                  ImageStore?.[
+                    ImageStore.length >= activeImage + 2 ? activeImage + 1 : 0
+                  ]
+                }
+                layout="fill"
+                alt="banner"
+              />
+            </div>
+            <div className=" flex-1 w-full rounded-sm bg-black overflow-hidden relative">
+              <Image
+                src={
+                  ImageStore?.[
+                    ImageStore.length >= activeImage + 2 ? activeImage + 2 : 1
+                  ]
+                }
+                layout="fill"
+                alt="banner"
+              />
+            </div>
+          </div>
         </div>
+
+        <ProductSection title="Sản phẩm bán chạy" data={trendings?.products} />
+
+        {productBrands.map((_) => {
+          return <ProductSection title={`${_.name}`} data={_?.products} />;
+        })}
       </Responsive>
     </div>
   );

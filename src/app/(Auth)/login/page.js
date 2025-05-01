@@ -1,277 +1,141 @@
 "use client";
+
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import {
+  authSelector,
+  handleChangeLoginState,
+} from "@/services/redux/Slices/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+
+import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import Link from "next/link";
-import { useState } from "react";
+import { LoginAccountSchema } from "@/services/schema/loginSchema";
+import { handleLogin } from "@/services/redux/Slices/auth/loginApi";
+import { useForm } from "react-hook-form";
+import { useGuestOnly } from "@/components/auth/useAuthRedirect";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 function LoginPage() {
-  const [dataForm, setDataForm] = useState({ email: "", password: "" });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+    clearErrors,
+    reset,
+    setError,
+  } = useForm({
+    resolver: zodResolver(LoginAccountSchema),
+  });
+  const dispatch = useDispatch();
+  const { loginState } = useSelector(authSelector);
   const [showPassword, setShowPassword] = useState(false);
-  const [errMessage, setErrorMessage] = useState(false);
 
-  const handleSubmitForm = () => {};
+  const onSubmitLogin = async (data) => {
+    dispatch(handleLogin(data));
+  };
+
+  useEffect(() => {
+    if (loginState.message) {
+      dispatch(
+        handleChangeLoginState({
+          message: "",
+        })
+      );
+    }
+  }, [watch("emailAndPhone"), watch("password")]);
   return (
-    <div className="w-full h-screen flex">
-      <div className="w-96 text-center text-slate-950 bg-white/15 backdrop-blur-xl m-auto p-4 rounded-md relative ">
+    <div className="w-full h-screen flex font-dancing-script">
+      <div className="w-96 text-center text-slate-950 backdrop-blur-xl m-auto p-4 rounded-md relative bg-white shadow-sm shadow-black">
         <div className="pb-4 mt-6">
           <div className=" w-20 h-20 mx-auto">
             <Link href="/">
               <img
                 src={`/images/logo.png`}
-                className="w-full h-full logo"
+                className="w-full h-full logo image-shadow"
                 alt=""
               />
             </Link>
           </div>
 
           <h2 className="text-3xl">Đăng nhập</h2>
-          <div
-            className="mt-4 mb-3"
-            onKeyUp={(e) => {
-              if (e.key.toLocaleLowerCase() === "enter") {
-                handleSubmitForm();
-              }
-            }}
-          >
+          <form onSubmit={handleSubmit(onSubmitLogin)}>
             <div className="w-4/5 mx-auto mb-2">
-              <input
-                className="p-2 rounded-md bg-transparent w-full border border-solid border-slate-50/0 hover:border-slate-50 focus:border-slate-50 outline-none placeholder:italic placeholder:text-slate-100"
+              <InputFormAdmin
+                classNameDiv={` text-start`}
+                className={`border-slate-300 relative placeholder:text-slate-950 ${
+                  errors.emailAndPhone?.message ? "!border-red-500" : null
+                }`}
+                placeholder="Email or phone"
+                warn={errors.emailAndPhone?.message}
+                title="Email or Phone"
                 type="text"
-                placeholder="Email"
-                value={dataForm.email}
-                onChange={(e) => {
-                  setDataForm((prev) => ({
-                    ...prev,
-                    email: e.target.value,
-                  }));
-                  setErrorMessage("");
-                }}
+                {...register("emailAndPhone")}
               />
             </div>
             <div className="w-4/5 mx-auto mb-1 relative">
-              <input
-                className="p-2 rounded-md bg-transparent w-full border border-solid border-slate-50/0 hover:border-slate-50 focus:border-slate-50 outline-none placeholder:italic placeholder:text-slate-100"
+              <InputFormAdmin
+                classNameDiv={` text-start`}
+                className={`border-slate-300 relative placeholder:text-slate-950 ${
+                  errors.password?.message ? "!border-red-500" : null
+                }`}
+                placeholder="Password"
+                warn={errors.password?.message}
+                title="Password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Mật khẩu"
-                value={dataForm.password}
-                onChange={(e) => {
-                  setDataForm((prev) => ({
-                    ...prev,
-                    password: e.target.value,
-                  }));
-                  setErrorMessage("");
-                }}
-              />
-              {showPassword ? (
-                <i
-                  className="fa-solid fa-eye absolute right-2 top-3"
-                  onClick={(e) => setShowPassword(!showPassword)}
-                ></i>
-              ) : (
-                <i
-                  className="fa-regular fa-eye-slash absolute right-2 top-3"
-                  onClick={(e) => setShowPassword(!showPassword)}
-                ></i>
-              )}
+                {...register("password")}
+              >
+                <div className="absolute right-3 top-0 bottom-0 flex items-center cursor-pointer">
+                  {showPassword ? (
+                    <FaEye
+                      className="image-shadow"
+                      onClick={(e) => setShowPassword(!showPassword)}
+                    />
+                  ) : (
+                    <FaEyeSlash
+                      className="image-shadow"
+                      onClick={(e) => setShowPassword(!showPassword)}
+                    />
+                  )}
+                </div>
+              </InputFormAdmin>
             </div>
             <div>
-              <span className="text-xs text-slate-100">{errMessage}</span>
+              <span className="text-xs text-rose-700 image-shadow">
+                {loginState?.message}
+              </span>
             </div>
-          </div>
 
-          <button
-            onClick={handleSubmitForm}
-            className="border border-solid px-4 py-1 rounded-md hover:opacity-75"
-          >
-            Xác nhận
-          </button>
+            <button
+              type="submit"
+              className="px-4 py-1 rounded-md hover:opacity-75 bg-blue-500 text-white font-bold"
+            >
+              Xác nhận
+            </button>
+          </form>
+
           <div className="mt-3 p-1">
-            <p className="text-sm cursor-default">
+            <p className="text-sm cursor-default image-shadow">
               Bạn chưa có tài khoản?{" "}
               <Link href="/register">
-                <span className="text-blue-400 cursor-pointer">Đăng ký</span>
+                <span className="text-blue-700 cursor-pointer">Đăng ký</span>
               </Link>
             </p>
           </div>
           <div className="p-1">
-            <p
-              className="text-sm cursor-default"
-              onClick={() => setIsFormLogin(false)}
+            <Link
+              className="text-sm text-blue-700 cursor-pointer image-shadow"
+              href={"forgot-password"}
             >
-              <span className="text-blue-400 cursor-pointer">
-                Bạn quên mật khẩu ư?{" "}
-              </span>
-            </p>
+              Bạn quên mật khẩu ư?{" "}
+            </Link>
           </div>
-
-          {/* <>
-              <div
-                className=" absolute top-1 left-1 w-10 h-10 rounded-full hover:bg-white flex items-center justify-center hover:text-black cursor-pointer"
-                onClick={() => {
-                  setIsFormLogin(true);
-                  setErrorMessage("");
-                }}
-                onChange={() => {
-                  if (countDownForget > 0) setCountDownForget(0);
-                }}
-              >
-                <FontAwesomeIcon
-                  icon="fa-solid fa-left-long"
-                  className=" text-2xl"
-                />
-              </div>
-              {renderForm?.forget ? (
-                <>
-                  <h2 className="text-3xl">Lấy lại mật khẩu</h2>
-                  <div className="mt-4 mb-3">
-                    <div className="w-4/5 mx-auto mb-2">
-                      <input
-                        className="p-2 rounded-md bg-transparent w-full border border-solid border-slate-50/0 hover:border-slate-50 focus:border-slate-50 outline-none placeholder:italic placeholder:text-slate-100"
-                        type="text"
-                        placeholder="Email"
-                        value={dataForget.email}
-                        onChange={(e) => {
-                          setWarningForget("");
-                          setDataForget((prev) => ({
-                            ...prev,
-                            email: e.target.value,
-                          }));
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div
-                    className="mt-4 mb-3"
-                    onKeyUp={(e) => {
-                      if (e.key.toLocaleLowerCase() === "enter") {
-                        handleSubmitForget();
-                      }
-                    }}
-                  >
-                    <div className="w-4/5 mx-auto mb-1 relative">
-                      <input
-                        className="p-2 rounded-md bg-transparent w-full border border-solid border-slate-50/0 hover:border-slate-50 focus:border-slate-50 outline-none placeholder:italic placeholder:text-slate-100"
-                        type="text"
-                        placeholder="Số điện thoại"
-                        value={dataForget.phone}
-                        onChange={(e) => {
-                          setWarningForget("");
-                          setDataForget((prev) => ({
-                            ...prev,
-                            phone: e.target.value,
-                          }));
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <span className="text-xs text-slate-100 font-bold">
-                        {`${
-                          !warnForget
-                            ? countDownForget > 0
-                              ? "Vui lòng thử lại sau " +
-                                formartHouseMinutesSeconds(countDownForget)
-                              : ""
-                            : warnForget
-                        }`}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleSubmitForget}
-                    className="border border-solid px-4 py-1 rounded-md hover:opacity-75"
-                  >
-                    Xác nhận
-                  </button>
-                </>
-              ) : (
-                <div>
-                  <h2 className="text-3xl">Nhập mã xác minh</h2>
-                  <p className=" text-sm font-thin text-white mt-1">
-                    Nhập mã xác minh gồm 6 chữ số mà chúng tôi đã gửi tới email{" "}
-                    {dataVeifyCode.email}, mã sẽ hết hạn sau{" "}
-                    <span className="text-green-500 font-bold">
-                      {formartHouseMinutesSeconds(countDownVerify || 0)}
-                    </span>
-                  </p>
-                  <div className="">
-                    <div className="mt-4 mb-3">
-                      <div className="w-4/5 mx-auto mb-1 relative">
-                        <input
-                          className="p-2 rounded-md bg-transparent w-full border border-solid border-slate-50/0 hover:border-slate-50 focus:border-slate-50 outline-none placeholder:italic placeholder:text-slate-100"
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Nhập mật khẩu mới"
-                          value={dataForgetPassword.password}
-                          onChange={(e) => {
-                            setDataForgetPassword((prev) => ({
-                              ...prev,
-                              warn: "",
-                              password: e.target.value,
-                            }));
-                          }}
-                        />
-                        {showPassword ? (
-                          <i
-                            className="fa-solid fa-eye absolute right-2 top-3"
-                            onClick={(e) => setShowPassword(!showPassword)}
-                          ></i>
-                        ) : (
-                          <i
-                            className="fa-regular fa-eye-slash absolute right-2 top-3"
-                            onClick={(e) => setShowPassword(!showPassword)}
-                          ></i>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-4 mb-3">
-                      <div className="w-4/5 mx-auto mb-1 relative">
-                        <input
-                          className="p-2 rounded-md bg-transparent w-full border border-solid border-slate-50/0 hover:border-slate-50 focus:border-slate-50 outline-none placeholder:italic placeholder:text-slate-100"
-                          type={"password"}
-                          placeholder="Nhập lại mật khẩu"
-                          value={dataForgetPassword.rePassword}
-                          onChange={(e) => {
-                            setDataForgetPassword((prev) => ({
-                              ...prev,
-                              warn: "",
-                              rePassword: e.target.value,
-                            }));
-                          }}
-                        />
-                      </div>
-                      <p className="text-xs text-slate-100">
-                        {dataForgetPassword.warn}
-                      </p>
-                    </div>
-                  </div>
-                  <VerifyComponent
-                    classx=" text-black"
-                    getValue={(value) => {
-                      if (handleSubmitChangePass()) {
-                        handleSubmitVerifyCode(value);
-                      }
-                    }}
-                    onExpired={() => {
-                      setIsFormLogin(true);
-                      setRenderForm({});
-                    }}
-                    totalVerify={dataVeifyCode.total}
-                    textBtnSuccess="Đổi mật khẩu"
-                    expRefresh={dataVeifyCode.expRefreshToken}
-                    clickRefresh={handleRefreshCode}
-                    onEnter={(value) => {
-                      if (handleSubmitChangePass()) {
-                        handleSubmitVerifyCode(value);
-                      }
-                    }}
-                  />
-                </div>
-              )}
-            </>
-           */}
         </div>
       </div>
     </div>
   );
 }
 
-export default LoginPage;
+export default useGuestOnly(LoginPage);

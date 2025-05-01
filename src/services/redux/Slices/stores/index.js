@@ -1,3 +1,4 @@
+import AuthRequest from "@/services/axios/AuthRequest";
 import GuestRequest from "@/services/axios/GuestRequest";
 import Toastify from "@/components/sections/Toastify";
 
@@ -41,16 +42,16 @@ const storesSlice = createSlice({
       state.onRefresh = true;
     });
     //#################################################################
-    builder.addCase(handleUpadateStore.pending, (state, action) => {
+    builder.addCase(handleUpdateStore.pending, (state, action) => {
       console.log("pending");
       state.isLoading = true;
     });
-    builder.addCase(handleUpadateStore.rejected, (state, action) => {
+    builder.addCase(handleUpdateStore.rejected, (state, action) => {
       console.log("faler");
       state.validators = action.payload?.validators ?? {};
       state.isLoading = false;
     });
-    builder.addCase(handleUpadateStore.fulfilled, (state, action) => {
+    builder.addCase(handleUpdateStore.fulfilled, (state, action) => {
       console.log("success");
       Toastify(action.payload?.data?.type, action.payload?.data?.message);
       state.isLoading = false;
@@ -73,8 +74,10 @@ const storesSlice = createSlice({
 
 export const handleGetStores = createAsyncThunk(
   "stores/handleGetStores",
-  async () => {
-    const response = await GuestRequest.get("stores");
+  async (data) => {
+    const response = await GuestRequest.get("stores", {
+      params: data,
+    });
     return { data: response.data };
   }
 );
@@ -83,7 +86,7 @@ export const handleCreateStore = createAsyncThunk(
   "stores/handleCreateStore",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await GuestRequest.post("stores", data);
+      const response = await AuthRequest.post("stores", data);
       return { data: response.data };
     } catch (error) {
       console.log(error);
@@ -109,8 +112,8 @@ export const handleDeleteStore = createAsyncThunk(
   }
 );
 
-export const handleUpadateStore = createAsyncThunk(
-  "stores/handleUpadateStore",
+export const handleUpdateStore = createAsyncThunk(
+  "stores/handleUpdateStore",
   async ({ id, ...data }, { rejectWithValue }) => {
     try {
       const response = await GuestRequest.patch(`stores/${id}`, data);

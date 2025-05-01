@@ -27,6 +27,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import SearchableDropdown from "@/components/ui/SearchableDropdown";
 import { handleRegexSlug } from "@/services/utils";
 import { useForm } from "react-hook-form";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function CategoryPage() {

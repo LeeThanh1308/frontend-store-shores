@@ -132,7 +132,7 @@ function FormOtp({
         className={`-px-6 w-4/5 py-1 mt-2 rounded-md ${
           total > 0
             ? "hover:opacity-75 bg-sky-500 text-slate-50"
-            : "text-rose-500"
+            : "text-rose-500 image-shadow"
         }`}
         onClick={(e) => {
           const value = handleSubmitForm(e);
@@ -143,19 +143,21 @@ function FormOtp({
         disabled={!total}
       >
         {total > 0
-          ? textBtnSuccess
+          ? `${textBtnSuccess} (${totalVerify})`
           : "Bạn đã nhập sai thông tin 3 lần. Vui lòng ấn gửi lại mã xác minh."}
       </button>
 
       {timeResend ? (
-        <p className={`py-1 mt-2 rounded-md text-green-500 text-center`}>
+        <p
+          className={`py-1 mt-2 rounded-md text-green-500 text-center image-shadow font-roboto`}
+        >
           Gửi lại sau {timeResend + "s"}
         </p>
       ) : (
         <button
-          className={`-px-6 w-4/5 py-1 mt-2 text-center rounded-md ${
+          className={`-px-6 w-4/5 py-1 mt-2  text-center rounded-md ${
             timeResend
-              ? "text-green-500"
+              ? "text-green-500 font-roboto"
               : "hover:opacity-75 text-slate-50 border bg-green-500"
           }`}
           onClick={clickRefresh}

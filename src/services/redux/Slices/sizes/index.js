@@ -5,6 +5,7 @@ const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
 const initialState = {
   sizes: [],
+  sizesWhere: [],
   isLoading: false,
   onRefresh: false,
   validators: {},
@@ -65,6 +66,18 @@ const sizesSlice = createSlice({
       state.isLoading = false;
       state.onRefresh = true;
     });
+
+    //#################################################################
+    builder.addCase(handleGetSizeWhereProductID.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleGetSizeWhereProductID.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleGetSizeWhereProductID.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.sizesWhere = action.payload ?? [];
+    });
   },
 });
 
@@ -114,6 +127,20 @@ export const handleUpdateSize = createAsyncThunk(
       return { data: response.data };
     } catch (error) {
       console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetSizeWhereProductID = createAsyncThunk(
+  "sizes/handleGetSizeWhereProductID",
+  async ({ id, ...query }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.get(`product-sizes/products/${id}`, {
+        params: query,
+      });
+      return response.data;
+    } catch (error) {
       return rejectWithValue(error.response?.data || "Request failed");
     }
   }

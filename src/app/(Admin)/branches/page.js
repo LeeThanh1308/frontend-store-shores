@@ -322,7 +322,7 @@ function Branches() {
           <div className=" grid grid-cols-8">
             <Button
               type="primary"
-              disabled={idsSelectedRows.length == 0}
+              disabled={idsSelectedRows?.length == 0}
               onClick={() => {
                 console.log(idsSelectedRows);
                 if (window.confirm("Bạn chắc chắn muốn xóa chi nhánh đã chọn?"))

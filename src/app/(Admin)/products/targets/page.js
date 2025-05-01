@@ -295,7 +295,7 @@ function Targets() {
           <div className=" grid grid-cols-8">
             <Button
               type="primary"
-              disabled={idsSelectedRows.length == 0}
+              disabled={idsSelectedRows?.length == 0}
               onClick={() => {
                 console.log(idsSelectedRows);
                 if (window.confirm("Bạn chắc chắn muốn xóa đối tượng đã chọn?"))

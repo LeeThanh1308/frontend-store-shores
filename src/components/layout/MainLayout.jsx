@@ -5,7 +5,7 @@ function MainLayout({ children }) {
   return (
     <>
       <Header />
-      {children}
+      <div className=" min-h-screen pb-64">{children}</div>
       <Footer />
     </>
   );

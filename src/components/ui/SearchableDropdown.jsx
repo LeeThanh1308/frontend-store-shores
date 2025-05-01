@@ -13,8 +13,10 @@ function SearchableDropdown({
   onOption = () => null,
   fieldIcon = "",
   fieldColor = "",
+  fieldName = "name",
   activeOptions = false,
   defaultOptions = {},
+  dataOptions = "",
   warn,
   title,
   ...props
@@ -27,22 +29,25 @@ function SearchableDropdown({
   useEffect(() => {
     const timerID = setTimeout(async () => {
       setMessage("");
-      if (valueSearch) {
-        await GuestRequest.get(domain, {
-          params: {
-            search: valueSearch,
-          },
-        }).then(
-          (response) =>
-            Array.isArray(response.data) && setResultSearch(response.data)
-        );
-      } else {
-        setResultSearch([]);
+      if (domain) {
+        if (valueSearch) {
+          await GuestRequest.get(domain, {
+            params: {
+              search: valueSearch,
+            },
+          }).then(
+            (response) =>
+              Array.isArray(response.data) && setResultSearch(response.data)
+          );
+        } else {
+          setResultSearch([]);
+        }
       }
-    }, 500);
+    }, 200);
 
     return () => clearTimeout(timerID);
   }, [valueSearch]);
+
   useEffect(() => {
     if (resultSearch.length == 0 && valueSearch) {
       setMessage("Không tìm thấy kết quả nào.");
@@ -58,6 +63,14 @@ function SearchableDropdown({
   useEffect(() => {
     if (defaultOptions?.id) setOption(defaultOptions);
   }, [defaultOptions?.id]);
+
+  useEffect(() => {
+    if (Array.isArray(dataOptions)) {
+      setResultSearch(dataOptions);
+    }
+  }, [dataOptions]);
+
+  console.log(resultSearch);
   return (
     <div>
       <div className="relative">
@@ -67,11 +80,13 @@ function SearchableDropdown({
         >
           {title}
         </label>
-        {option?.name ? (
+        {option?.[fieldName] ? (
           <div
             className={`p-2 rounded-md w-full border border-solid border-blue-700 outline-none placeholder:text-blue-700 z-10 bg-white relative ${props.className}`}
           >
-            <p className="text-sm font-medium font-roboto">{option?.name}</p>
+            <p className="text-sm font-medium font-roboto text-shadow">
+              {option?.[fieldName]}
+            </p>
             <div
               className=" absolute top-0 bottom-0 right-2 flex items-center"
               onClick={() => {
@@ -97,7 +112,7 @@ function SearchableDropdown({
               onFocus={() => setShowOpt(true)}
               autoFocus={showOpt}
             />
-            {showOpt && valueSearch && (
+            {showOpt && (valueSearch || dataOptions) && (
               <div className=" absolute top-full rounded-xl right-0 left-0 min-w-28 z-50">
                 <IsArray
                   data={resultSearch}
@@ -117,7 +132,7 @@ function SearchableDropdown({
                     {resultSearch.map((_, i) => (
                       <div
                         key={i}
-                        className=" flex justify-between gap-2 hover:text-blue-700 hover:shadow shadow-slate-400 rounded-sm cursor-pointer"
+                        className=" flex justify-between items-center gap-2 hover:text-blue-700 hover:shadow shadow-slate-400 rounded-sm cursor-pointer"
                         onClick={() => {
                           onOption(_);
                           setOption(_);
@@ -135,15 +150,15 @@ function SearchableDropdown({
                         )}
                         {fieldColor && (
                           <div
-                            className=" w-5 h-5 rounded-full shadow shadow-black"
+                            className=" w-5 h-5 rounded-full shadow shadow-black text-shadow ml-2"
                             style={{ backgroundColor: _?.[fieldColor] }}
                           ></div>
                         )}
                         <p
-                          className="text-sm font-medium font-roboto p-2"
+                          className="text-sm font-medium font-roboto p-2 text-shadow"
                           style={{ color: _?.[fieldColor] }}
                         >
-                          {_.name}
+                          {_?.[fieldName]}
                         </p>
                       </div>
                     ))}{" "}

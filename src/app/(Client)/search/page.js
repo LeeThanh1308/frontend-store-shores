@@ -1,126 +1,175 @@
 "use client";
-import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { IoMenu } from "react-icons/io5";
-import Responsive from "@/components/layout/Responsive";
-import FilterTypeSearchBox from "@/components/ui/FilterTypeSearchBox";
-import ProductItem from "@/components/sections/ProductItem";
-function Search() {
-  const categories = [
-    "Tất cả",
-    "Sữa rửa mặt (Kem, gel, sữa)",
-    "Sữa",
-    "Sữa tắm, xà bông",
-    "Mặt nạ",
-    "Dụng cụ vệ sinh mũi",
-    "Thuốc nhỏ mắt",
-    "Chăm sóc cơ thể",
-    "Chăm sóc da mặt",
-    "Chống nắng toàn thân",
-    "Tất cả",
-    "Sữa rửa mặt (Kem, gel, sữa)",
-    "Sữa",
-    "Sữa tắm, xà bông",
-    "Mặt nạ",
-    "Dụng cụ vệ sinh mũi",
-    "Thuốc nhỏ mắt",
-    "Chăm sóc cơ thể",
-    "Chăm sóc da mặt",
-    "Chống nắng toàn thân",
-    "Tất cả",
-    "Sữa rửa mặt (Kem, gel, sữa)",
-    "Sữa",
-    "Sữa tắm, xà bông",
-    "Mặt nạ",
-    "Dụng cụ vệ sinh mũi",
-    "Thuốc nhỏ mắt",
-    "Chăm sóc cơ thể",
-    "Chăm sóc da mặt",
-    "Chống nắng toàn thân",
-    "Tất cả",
-    "Sữa rửa mặt (Kem, gel, sữa)",
-    "Sữa",
-    "Sữa tắm, xà bông",
-    "Mặt nạ",
-    "Dụng cụ vệ sinh mũi",
-    "Thuốc nhỏ mắt",
-    "Chăm sóc cơ thể",
-    "Chăm sóc da mặt",
-    "Chống nắng toàn thân",
-    "Tất cả",
-    "Sữa rửa mặt (Kem, gel, sữa)",
-    "Sữa",
-    "Sữa tắm, xà bông",
-    "Mặt nạ",
-    "Dụng cụ vệ sinh mũi",
-    "Thuốc nhỏ mắt",
-    "Chăm sóc cơ thể",
-    "Chăm sóc da mặt",
-    "Chống nắng toàn thân",
-    "Tất cả",
-    "Sữa rửa mặt (Kem, gel, sữa)",
-    "Sữa",
-    "Sữa tắm, xà bông",
-    "Mặt nạ",
-    "Dụng cụ vệ sinh mũi",
-    "Thuốc nhỏ mắt",
-    "Chăm sóc cơ thể",
-    "Chăm sóc da mặt",
-    "Chống nắng toàn thân",
-  ];
 
-  const fackData = new Array(10).fill(null);
+import {
+  handleGetSearch,
+  handleGetSearchFilter,
+  searchSelector,
+} from "@/services/redux/Slices/search";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+
+import FilterTypeSearchBox from "@/components/ui/FilterTypeSearchBox";
+import FilterTypeSliderRange from "@/components/ui/FilterTypeSliderRange";
+import { IoMenu } from "react-icons/io5";
+import IsArray from "@/components/ui/IsArray";
+import { Pagination } from "antd";
+import ProductItem from "@/components/sections/ProductItem";
+import Responsive from "@/components/layout/Responsive";
+import { sortOptions } from "@/services/utils/sortOrder";
+import { useSearchParams } from "next/navigation";
+
+function Search() {
+  const dispatch = useDispatch();
   const searchParams = useSearchParams();
+  const divRef = useRef(null);
   const search = searchParams.get("s");
-  const [activeCategory, setActiveCategory] = useState(0);
+  const brandParam = searchParams.get("brand");
+  const objectParam = searchParams.get("object");
+  const categoryParam = searchParams.get("category");
+  const { search: searchData, onRefresh } = useSelector(searchSelector);
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState("");
+  const [priceRange, setPriceRange] = useState();
+  const [filterColors, setFilterColors] = useState([]);
+  const [filterObjects, setFilterObjects] = useState([]);
+  const [filterCategories, setFilterCategories] = useState([]);
+  const [filterBrands, setFilterBrands] = useState([]);
+
+  const { sortOrder, useFilters } = useMemo(() => {
+    let sortOrder;
+    let useFilters = {};
+    if (sortBy) {
+      sortOrder = sortBy;
+    }
+
+    if (brandParam) {
+      useFilters.brand = brandParam;
+    }
+    if (objectParam) {
+      useFilters.object = objectParam;
+    }
+    if (categoryParam) {
+      useFilters.category = categoryParam;
+    }
+    if (priceRange) {
+      useFilters.priceRange = priceRange;
+    }
+
+    if (Array.isArray(filterColors) && filterColors?.length > 0) {
+      useFilters.colors = filterColors;
+    }
+    if (Array.isArray(filterObjects) && filterObjects?.length > 0) {
+      useFilters.objects = filterObjects;
+    }
+
+    if (Array.isArray(filterBrands) && filterBrands?.length > 0) {
+      useFilters.brands = filterBrands;
+    }
+    if (Array.isArray(filterCategories) && filterCategories?.length > 0) {
+      useFilters.categories = filterCategories;
+    }
+    return { sortOrder, useFilters };
+  }, [
+    sortBy,
+    priceRange,
+    filterColors,
+    filterObjects,
+    filterCategories,
+    filterBrands,
+    brandParam,
+    objectParam,
+    categoryParam,
+  ]);
+  useEffect(() => {
+    if (searchData?.filters) {
+      dispatch(
+        handleGetSearchFilter({
+          keyword: search,
+          sortOrder,
+          useFilters,
+          page,
+        })
+      );
+    }
+  }, [
+    sortBy,
+    priceRange,
+    filterColors,
+    filterBrands,
+    filterObjects,
+    filterCategories,
+  ]);
+
+  useEffect(() => {
+    if (search) dispatch(handleGetSearch({ keyword: search, page }));
+    if (brandParam || objectParam || categoryParam) {
+      dispatch(handleGetSearch({ sortOrder, useFilters, page }));
+    }
+  }, [search, brandParam, objectParam, categoryParam, page]);
+
+  useEffect(() => {
+    if (searchData?.products && divRef.current) {
+      divRef.current.scrollIntoView({
+        behavior: "smooth", // Cuộn mượt mà
+        block: "start", // Cuộn đến phần tử sao cho nó nằm ở đầu màn hình
+      });
+    }
+  }, [searchData]);
   return (
     <div>
-      <div className="w-full bg-[#EDF0F3] py-4">
+      <div className="w-full py-4">
+        <h1 className="font-dancing-script text-rose-500 text-5xl text-center">
+          {search && `Tìm kiếm sản phẩm "${search}"`}
+          {brandParam && `Giày ${brandParam}`}
+          {objectParam && `Giày ${objectParam}`}
+          {categoryParam && `Giày ${categoryParam}`}
+        </h1>
         <Responsive>
-          <div className=" w-full rounded-lg bg-white p-3">
-            <div className=" flex items-center gap-4 mb-2">
-              {fackData.slice(0, 2).map((_, ix) => (
-                <div
-                  key={ix}
-                  onClick={() => setActiveCategory(ix)}
-                  className=" flex gap-2 items-center"
-                >
-                  <div
-                    className={`p-1 rounded-full ${
-                      activeCategory == ix
-                        ? `w-5 h-5 border-[5px] border-blue-700`
-                        : `border w-5 h-5 border-slate-400`
-                    }`}
-                  ></div>
-                  <span className=" font-light">Sản phẩm</span>
-                </div>
-              ))}
-            </div>
-            <div>
-              <p className=" text-slate-700">
-                Tìm thấy{" "}
-                <span className=" font-semibold text-slate-700">13565</span> bài
-                viết với từ khóa{" "}
-                <span className=" text-black font-semibold">
-                  &quot;{search}&quot;
-                </span>
-              </p>
-            </div>
-          </div>
-
-          <div className=" mt-6 flex gap-4">
-            <div className=" w-3/12 h-fit bg-white rounded-lg sticky top-2">
+          <div className=" mt-6 flex gap-4" ref={divRef}>
+            <div className=" w-3/12 h-fit shadow-sm shadow-black/35 pb-4 rounded-lg sticky top-2">
               <div className=" font-semibold text-base py-3 px-3 border-b border-slate-200 flex items-center gap-1">
                 <IoMenu />
                 <h1>Bộ lọc nâng cao</h1>
               </div>
 
               <div className="p-3 min-h-0 max-h-[80vh] overflow-y-hidden hover:overflow-y-auto overflow-x-hidden scrollbar-custom">
+                <FilterTypeSliderRange
+                  onOption={([a, b]) =>
+                    setPriceRange({
+                      min: +a,
+                      max: +b,
+                    })
+                  }
+                />
                 <FilterTypeSearchBox
-                  title="Loại sản phẩm"
+                  title="Màu sản phẩm"
                   show={true}
-                  data={categories}
+                  data={searchData?.filters?.colors}
+                  onOptions={(value) => setFilterColors(value)}
+                  fieldName="name"
+                />
+                <FilterTypeSearchBox
+                  title="Thương hiệu"
+                  show={true}
+                  onOptions={(value) => setFilterBrands(value)}
+                  data={searchData?.filters?.brands}
+                  fieldName="name"
+                />
+
+                <FilterTypeSearchBox
+                  title="Đối tượng"
+                  show={false}
+                  onOptions={(value) => setFilterObjects(value)}
+                  data={searchData?.filters?.objects}
+                  fieldName="name"
+                />
+
+                <FilterTypeSearchBox
+                  title="Loại giày"
+                  show={false}
+                  onOptions={(value) => setFilterCategories(value)}
+                  data={searchData?.filters?.categories}
+                  fieldName="name"
                 />
               </div>
             </div>
@@ -138,61 +187,52 @@ function Search() {
                   <select
                     id="countries"
                     class="text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    onChange={(e) => setSortBy(e.target.value)}
                   >
                     <option selected>Tùy chọn</option>
-                    <option value="US">United States</option>
-                    <option value="CA">Canada</option>
-                    <option value="FR">France</option>
-                    <option value="DE">Germany</option>
+                    {sortOptions.map((_, key) => (
+                      <option key={key} value={_.value}>
+                        {_.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
-              <div className={`w-full h-auto grid gap-2 grid-cols-4`}>
-                {/* Child Item */}
-                {fackData.map((_, index) => {
-                  return (
-                    <ProductItem
-                      brand="Nike"
-                      name="Giày Nike Air Jordan 1 Retro Low OG ‘Mocha’ [CZ0858 102]"
-                    />
-                  );
-                })}
-              </div>
+
+              <IsArray
+                data={searchData?.products}
+                renderElse={
+                  <div className="h-1/4 flex justify-center items-center pb-12">
+                    <div className=" w-full flex-col flex py-4">
+                      <h1 className=" text-white text-shadow font-bold font-dancing-script py-2 text-center text-3xl">
+                        Không tìm thấy sản phẩm.
+                      </h1>
+                    </div>
+                  </div>
+                }
+              >
+                <div className={`w-full h-auto grid gap-2 grid-cols-4`}>
+                  {/* Child Item */}
+                  {searchData?.products?.map((_, index) => {
+                    return (
+                      <ProductItem showTypes={true} data={_} key={index} />
+                    );
+                  })}
+                </div>
+                <div className="mt-8">
+                  <Pagination
+                    align="center"
+                    defaultCurrent={1}
+                    onChange={(page) => setPage(page)}
+                    pageSize={searchData?.limit}
+                    total={+searchData?.totalPage * +searchData?.limit}
+                  />
+                </div>
+              </IsArray>
             </div>
           </div>
         </Responsive>
       </div>
-
-      {/* Not found */}
-      {!search && (
-        <div className=" bg-[#EDF0F3] h-1/4 flex justify-center items-center pb-12">
-          <div className=" w-1/4 flex-col flex py-4">
-            <div className="aspect-video relative">
-              <Image
-                src={"/assets/icons/not-found.svg"}
-                layout="fill"
-                alt="Search"
-              />
-            </div>
-            <h1 className=" text-slate-600 font-bold py-2 text-center text-lg">
-              Ôi! Không tìm thấy sản phẩm với từ khoá
-            </h1>
-
-            <div className="py-2 px-3 bg-white rounded-lg">
-              <ul className=" list-disc px-6 text-gray-600 space-y-3">
-                <li>Kiểm tra lỗi chính tả với từ khoá đã nhập</li>
-                <li>
-                  Trong trường hợp cần hỗ trợ, hãy liên hệ với Long Châu qua
-                  tổng đài miễn phí{" "}
-                  <a href="tel:+1800 6928" className=" text-blue-700 font-bold">
-                    1800 6928
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
