@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Space, Table } from "antd";
+import { Button, Form, Input, Select, Space, Table } from "antd";
 import React, {
   useCallback,
   useEffect,
@@ -8,25 +8,26 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { generateUrlImage, handleRegexSlug } from "@/services/utils";
 import {
-  handleCreateStore,
-  handleDeleteStore,
-  handleGetStores,
-  handleUpadateStore,
-  storesSelector,
-} from "@/services/redux/Slices/stores";
+  handleCreateSlider,
+  handleDeleteSlider,
+  handleGetSliders,
+  handleUpdateSlider,
+  sliderSelector,
+} from "@/services/redux/Slices/sliders";
 import { useDispatch, useSelector } from "react-redux";
 
+import { CreatedSlidersSchemaSchema } from "@/services/schema/slidersSchema";
 import FormPopup from "@/components/sections/FormPopup";
 import Highlighter from "react-highlight-words";
+import Image from "next/image";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import { SearchOutlined } from "@ant-design/icons";
-import { handleRegexSlug } from "@/services/utils";
-import { storeSchema } from "@/services/schema/storesSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-function Stores() {
+function SliderPage() {
   const {
     register,
     handleSubmit,
@@ -37,30 +38,27 @@ function Stores() {
     reset,
     setError,
   } = useForm({
-    resolver: zodResolver(storeSchema),
+    resolver: zodResolver(CreatedSlidersSchemaSchema),
   });
   const dispatch = useDispatch();
-  const { stores, validators, onRefresh } = useSelector(storesSelector);
+  const { sliders = [], validators, onRefresh } = useSelector(sliderSelector);
   const [showFormCreated, setShowFormCreated] = useState(false);
   const [showFormUpdated, setShowFormUpdated] = useState(false);
   const [idsSelectedRows, setIdsselectedRows] = useState([]);
-  const [idThisUpdated, setIdThisUpdated] = useState(undefined);
   const onSubmit = useCallback(
     (data) => {
-      if (showFormCreated) dispatch(handleCreateStore(data));
-      if (showFormUpdated) {
-        dispatch(handleUpadateStore({ ...data, id: idThisUpdated }));
-      }
+      if (showFormCreated) dispatch(handleCreateSlider(data));
+      if (showFormUpdated) dispatch(handleUpdateSlider(data));
     },
     [showFormCreated, showFormUpdated]
   );
 
   useEffect(() => {
     const timerID = setTimeout(() => {
-      if (stores?.length == 0) dispatch(handleGetStores());
+      if (sliders?.length == 0) dispatch(handleGetSliders());
     }, 200);
     return () => clearTimeout(timerID);
-  }, [stores?.length]);
+  }, [sliders?.length]);
 
   useEffect(() => {
     Object.entries(validators).forEach(([field, message]) => {
@@ -81,7 +79,6 @@ function Stores() {
       reset();
       setShowFormCreated(false);
       setShowFormUpdated(false);
-      setIdThisUpdated(undefined);
     }
   }, [onRefresh]);
 
@@ -212,33 +209,46 @@ function Stores() {
   const columns = useMemo(
     () => [
       {
-        title: "ID",
-        dataIndex: "id",
-        key: "id",
+        title: "Icons",
+        dataIndex: "src",
+        key: "src",
+        render: (_, record) =>
+          record.src && (
+            <Image
+              src={`${process.env.NEXT_PUBLIC_DOMAIN_API}${process.env.NEXT_PUBLIC_PARAM_GET_FILE_API}${record.src}`}
+              alt="src"
+              width={40}
+              height={40}
+            />
+          ),
       },
       {
-        title: "Số lượng",
-        dataIndex: "quantity",
-        key: "quantity",
-        ...getColumnSearchProps("quantity"),
+        title: "Name",
+        dataIndex: "name",
+        key: "name",
+        ...getColumnSearchProps("name"),
       },
       {
-        title: "Cập nhật lần cuối",
-        dataIndex: "updatedAt",
-        key: "updatedAt",
-        sorter: (a, b) =>
-          new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
-        render: (value) =>
-          new Date(value).toLocaleString("vi-VN", { hour12: false }),
+        title: "Slug",
+        dataIndex: "slug",
+        key: "slug",
+        ...getColumnSearchProps("slug"),
       },
       {
-        title: "Ngày tạo",
-        dataIndex: "createdAt",
-        key: "createdAt",
-        sorter: (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        render: (value) =>
-          new Date(value).toLocaleString("vi-VN", { hour12: false }),
+        title: "Link",
+        dataIndex: "href",
+        key: "href",
+        ...getColumnSearchProps("href"),
+        render: (_) => {
+          return (
+            <p
+              onClick={() => window.open(_)}
+              className=" hover:underline hover:text-blue-700 text-black"
+            >
+              {_}
+            </p>
+          );
+        },
       },
       {
         title: "Action",
@@ -248,11 +258,11 @@ function Stores() {
             <span
               className=" cursor-pointer hover:text-sky-500"
               onClick={async (e) => {
+                await dispatch(handleGetSliders({ childrenId: record?.id }));
                 Object.entries(record).forEach(([field, message]) => {
                   if ((field && typeof message === "boolean") || message)
                     setValue(field, message);
                 });
-                setIdThisUpdated(record?.id);
                 setShowFormUpdated(true);
               }}
             >
@@ -261,8 +271,8 @@ function Stores() {
             <span
               className=" cursor-pointer hover:text-rose-500"
               onClick={() => {
-                if (window.confirm("Bạn chắc chắn muốn xóa kho hàng này?"))
-                  dispatch(handleDeleteStore({ id: record?.id }));
+                if (window.confirm("Bạn chắc chắn muốn xóa slider này?"))
+                  dispatch(handleDeleteSlider({ id: record?.id }));
               }}
             >
               Delete
@@ -296,14 +306,14 @@ function Stores() {
       <div className="p-6 z-0">
         <div className="flex justify-between items-center">
           <div className="mb-4 font-bold text-5xl text-rose-700">
-            <span>Quản trị kho hàng </span>
-            <span className=" text-3xl">({stores?.length} kho hàng)</span>
+            <span>Quản trị slider </span>
+            <span className=" text-3xl">({sliders?.length} slider)</span>
           </div>
           <div
             className="font-bold rounded bg-green-500 p-2 px-3 text-white text-lg hover:bg-green-400 cursor-pointer"
             onClick={(e) => setShowFormCreated(true)}
           >
-            Thêm kho hàng +
+            Thêm slider +
           </div>
         </div>
         <div>
@@ -312,17 +322,16 @@ function Stores() {
             rowSelection={{
               ...rowSelection,
             }}
-            dataSource={stores}
-            rowKey="id"
+            dataSource={sliders ?? []}
+            rowKey={"id"}
           />
           <div className=" grid grid-cols-8">
             <Button
               type="primary"
               disabled={idsSelectedRows.length == 0}
               onClick={() => {
-                console.log(idsSelectedRows);
-                if (window.confirm("Bạn chắc chắn muốn xóa kho hàng đã chọn?"))
-                  dispatch(handleDeleteStore({ ids: idsSelectedRows }));
+                if (window.confirm("Bạn chắc chắn muốn xóa slider đã chọn?"))
+                  dispatch(handleDeleteSlider({ ids: idsSelectedRows }));
               }}
               danger
             >
@@ -333,7 +342,7 @@ function Stores() {
       </div>
 
       <FormPopup
-        title="Sửa kho hàng"
+        title="Sửa slider"
         isShowForm={showFormUpdated}
         onClose={(state) => {
           reset();
@@ -343,47 +352,67 @@ function Stores() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <InputFormAdmin
             className={!errors.name?.message ? null : "!border-red-500"}
-            title={"Tên kho hàng"}
+            title={"Tên slider"}
             warn={errors.name?.message}
             type="text"
-            placeholder="Tên kho hàng"
+            placeholder="Tên slider"
             {...register("name")}
           />
 
           <InputFormAdmin
             type="text"
-            title={"Địa chỉ"}
-            placeholder="Địa chỉ"
-            {...register("address")}
-            warn={errors.address?.message}
-            className={!errors.address?.message ? null : "!border-red-500"}
-          />
-
-          <InputFormAdmin
-            type="text"
-            title={"Phone"}
-            placeholder="Phone"
-            {...register("phone")}
-            warn={errors.phone?.message}
-            className={!errors.phone?.message ? null : "!border-red-500"}
-          />
-
-          <InputFormAdmin
-            type="text"
-            title={"Latitude"}
-            placeholder="Latitude"
-            {...register("latitude")}
-            warn={errors.latitude?.message}
-            className={!errors.latitude?.message ? null : "!border-red-500"}
+            title={"Slug"}
+            placeholder="Slug"
+            {...register("slug")}
+            warn={errors.slug?.message}
+            value={handleRegexSlug(watch().name)}
+            className={!errors.slug?.message ? null : "!border-red-500"}
           />
           <InputFormAdmin
+            className={!errors.href?.message ? null : "!border-red-500"}
+            title={"Link"}
+            warn={errors.href?.message}
             type="text"
-            title={"Longitude"}
-            placeholder="Longitude"
-            {...register("longitude")}
-            warn={errors.longitude?.message}
-            className={!errors.longitude?.message ? null : "!border-red-500"}
+            placeholder="Link"
+            {...register("href")}
           />
+          {typeof watch().src == "string" ? (
+            <div className=" p-3 relative">
+              <div className=" relative w-fit">
+                <Image
+                  src={generateUrlImage(watch().src)}
+                  alt="srcs"
+                  width={100}
+                  height={100}
+                />
+                <div
+                  onClick={() => {
+                    const { src, ...args } = watch();
+                    reset({
+                      ...args,
+                    });
+                  }}
+                  className="w-4 h-4 bg-rose-500 hover:bg-rose-700 rounded-full absolute top-0 right-0 cursor-pointer"
+                ></div>
+              </div>
+              <p className="text-rose-700 indent-1 warn w-full mb-1 text-start text-sm">
+                {errors.src?.message}
+              </p>
+            </div>
+          ) : (
+            <InputFormAdmin
+              type="file"
+              title={"Upload icon"}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                console.log(file);
+                setValue("file", file);
+                clearErrors("file");
+              }}
+              warn={errors.file?.message}
+              className={!errors.file?.message ? null : "!border-red-500"}
+            />
+          )}
 
           <div className="mt-4 mb-3 w-11/12 mx-auto">
             <div className="mt-4 flex justify-end">
@@ -399,7 +428,7 @@ function Stores() {
       </FormPopup>
 
       <FormPopup
-        title="Thêm kho hàng"
+        title="Thêm slider"
         isShowForm={showFormCreated}
         onClose={(state) => {
           reset();
@@ -409,46 +438,43 @@ function Stores() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <InputFormAdmin
             className={!errors.name?.message ? null : "!border-red-500"}
-            title={"Tên kho hàng"}
+            title={"Tên slider"}
             warn={errors.name?.message}
             type="text"
-            placeholder="Tên kho hàng"
+            placeholder="Tên slider"
             {...register("name")}
           />
 
           <InputFormAdmin
             type="text"
-            title={"Địa chỉ"}
-            placeholder="Địa chỉ"
-            {...register("address")}
-            warn={errors.address?.message}
-            className={!errors.address?.message ? null : "!border-red-500"}
+            title={"Slug"}
+            placeholder="Slug"
+            {...register("slug")}
+            warn={errors.slug?.message}
+            value={handleRegexSlug(watch().name)}
+            className={!errors.slug?.message ? null : "!border-red-500"}
           />
 
           <InputFormAdmin
+            className={!errors.href?.message ? null : "!border-red-500"}
+            title={"Link"}
+            warn={errors.href?.message}
             type="text"
-            title={"Phone"}
-            placeholder="Phone"
-            {...register("phone")}
-            warn={errors.phone?.message}
-            className={!errors.phone?.message ? null : "!border-red-500"}
+            placeholder="Link"
+            {...register("href")}
           />
 
           <InputFormAdmin
-            type="text"
-            title={"Latitude"}
-            placeholder="Latitude"
-            {...register("latitude")}
-            warn={errors.latitude?.message}
-            className={!errors.latitude?.message ? null : "!border-red-500"}
-          />
-          <InputFormAdmin
-            type="text"
-            title={"Longitude"}
-            placeholder="Longitude"
-            {...register("longitude")}
-            warn={errors.longitude?.message}
-            className={!errors.longitude?.message ? null : "!border-red-500"}
+            type="file"
+            title={"Upload icon"}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              console.log(file);
+              setValue("file", file);
+              clearErrors("file");
+            }}
+            warn={errors.file?.message}
+            className={!errors.file?.message ? null : "!border-red-500"}
           />
 
           <div className="mt-4 mb-3 w-11/12 mx-auto">
@@ -467,4 +493,4 @@ function Stores() {
   );
 }
 
-export default Stores;
+export default SliderPage;

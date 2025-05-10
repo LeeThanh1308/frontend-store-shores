@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
 import { Button } from "antd";
-import { ChangePassSchema } from "@/services/schema/changePassSchema";
+import { ChangePassSchemaForget } from "@/services/schema/changePassSchema";
 import { ForgotPasswordSchema } from "@/services/schema/forgotPasswordSchema";
 import FormOtp from "@/components/sections/FormOtp";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
@@ -48,7 +48,7 @@ function ForgotPassword() {
     reset: resetChangePass,
     setError: setErrorChangePass,
   } = useForm({
-    resolver: zodResolver(ChangePassSchema),
+    resolver: zodResolver(ChangePassSchemaForget),
   });
   const dispatch = useDispatch();
   const { forgetPassState, dataVerifyCode, statusVerify } =

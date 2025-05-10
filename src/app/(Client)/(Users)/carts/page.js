@@ -19,6 +19,7 @@ import InputQuantitySpinner from "@/components/ui/InputQuantitySpinner";
 import Link from "next/link";
 import Responsive from "@/components/layout/Responsive";
 import { authSelector } from "@/services/redux/Slices/auth";
+import { useRequireAuth } from "@/components/auth/useAuthRedirect";
 
 function CartPage() {
   const dispatch = useDispatch();
@@ -79,7 +80,9 @@ function CartPage() {
                       />
                       <div className="truncate w-3/5 ...">
                         <div className="">{_.name}</div>
-                        <div>Size: {_.size.type}</div>
+                        <div>
+                          Size: {_.size.type} - {_?.color?.name}
+                        </div>
                       </div>
                     </div>
                     <div className="w-1/6 text-start text-rose-500">
@@ -89,9 +92,10 @@ function CartPage() {
                       <InputQuantitySpinner
                         defaultValue={_?.quantity}
                         max={_?.sold?.inventory}
-                        onOption={(quantity) =>
-                          dispatch(handleUpdateCart({ id: _?.id, quantity }))
-                        }
+                        onOption={(quantity) => {
+                          _?.quantity != quantity &&
+                            dispatch(handleUpdateCart({ id: _?.id, quantity }));
+                        }}
                       />
                     </div>
                     <div className="w-1/6 text-end text-green-500">
@@ -166,7 +170,7 @@ function CartPage() {
                   </div>
                 </div>
                 {isAuthenticated ? (
-                  <Link href="/pay">
+                  <Link href="/payments">
                     <div className="w-full h-10 border bg-red-500 flex justify-center items-center font-bold text-white rounded-lg cursor-pointer hover:bg-red-500/70">
                       Thanh toán: {handleConvertPrice(carts?.total)}
                     </div>
@@ -193,4 +197,4 @@ function CartPage() {
   );
 }
 
-export default CartPage;
+export default useRequireAuth(CartPage);

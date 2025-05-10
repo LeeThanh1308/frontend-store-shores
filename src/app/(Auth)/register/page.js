@@ -48,7 +48,7 @@ function Regsister() {
   console.log(errors);
   return (
     <div className="w-full h-screen flex text-center relative">
-      <div className="w-3/12 text-slate-950 m-auto bg-white/60 backdrop-blur-xl rounded-lg font-great font-bold p-3">
+      <div className="w-3/12 text-slate-950 m-auto bg-white rounded-lg font-great font-bold p-3 px-4">
         <div>
           <div className=" w-20 h-20 mx-auto">
             <Link href="/" className="">

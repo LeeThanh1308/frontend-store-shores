@@ -1,58 +1,63 @@
 "use client";
 
-import { MdCategory, MdOutlineCategory } from "react-icons/md";
+import { useEffect, useMemo, useState } from "react";
 
 import { BsBoxSeam } from "react-icons/bs";
 import { FaRegUser } from "react-icons/fa";
 import GuestRequest from "@/services/axios/GuestRequest";
 import { IoIosGitBranch } from "react-icons/io";
 import Link from "next/link";
+import { MdOutlineCategory } from "react-icons/md";
 import RevenueStatisticCollums from "@/components/sections/RevenueStatisticCollums";
 import RevenueStatistics from "@/components/sections/RevenueStatistics";
-import RevenueStatisticsPie from "@/components/sections/RevenueStatisticsPie";
-
-const data = [
-  {
-    icon: <MdOutlineCategory size={32} className="" />,
-    bg: "bg-amber-500",
-    color: "text-amber-500",
-    title: "Categories",
-    href: "/categories",
-    total:
-      (await GuestRequest.get("/categories/count").then((res) => res.data)) ??
-      0,
-  },
-
-  {
-    icon: <BsBoxSeam size={32} className="" />,
-    bg: "bg-blue-500",
-    color: "text-blue-500",
-    title: "Products",
-    href: "/products",
-    total:
-      (await GuestRequest.get("/products/count").then((res) => res.data)) ?? 0,
-  },
-  {
-    icon: <IoIosGitBranch size={32} />,
-    bg: "bg-rose-500",
-    color: "text-rose-500",
-    title: "Chi nhánh",
-    href: "/branches",
-    total:
-      (await GuestRequest.get("/branches/count").then((res) => res.data)) ?? 0,
-  },
-  {
-    icon: <FaRegUser size={32} />,
-    bg: "bg-green-500",
-    color: "text-green-500",
-    title: "Customers",
-    href: "/users",
-    total:
-      (await GuestRequest.get("/accounts/count").then((res) => res.data)) ?? 0,
-  },
-];
 
 function Page() {
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const [categories, products, branches, customers] = await Promise.all([
+        GuestRequest.get("/categories/count").then((res) => res.data),
+        GuestRequest.get("/products/count").then((res) => res.data),
+        GuestRequest.get("/branches/count").then((res) => res.data),
+        GuestRequest.get("/accounts/count").then((res) => res.data),
+      ]);
+      setData([
+        {
+          icon: <MdOutlineCategory size={32} />,
+          bg: "bg-amber-500",
+          color: "text-amber-500",
+          title: "Categories",
+          href: "categories",
+          total: categories ?? 0,
+        },
+        {
+          icon: <BsBoxSeam size={32} />,
+          bg: "bg-blue-500",
+          color: "text-blue-500",
+          title: "Products",
+          href: "products",
+          total: products ?? 0,
+        },
+        {
+          icon: <IoIosGitBranch size={32} />,
+          bg: "bg-rose-500",
+          color: "text-rose-500",
+          title: "Chi nhánh",
+          href: "branches",
+          total: branches ?? 0,
+        },
+        {
+          icon: <FaRegUser size={32} />,
+          bg: "bg-green-500",
+          color: "text-green-500",
+          title: "Customers",
+          href: "users",
+          total: customers ?? 0,
+        },
+      ]);
+    };
+    fetchData();
+  }, []);
   return (
     <div className="pb-8">
       <div className=" grid grid-cols-4 gap-3">

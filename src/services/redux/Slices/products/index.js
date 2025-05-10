@@ -4,6 +4,7 @@ import Toastify from "@/components/sections/Toastify";
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
 const initialState = {
+  product: {},
   products: [],
   isLoading: false,
   onRefresh: false,
@@ -32,6 +33,17 @@ const productsSlice = createSlice({
       state.products = Array.isArray(action.payload?.data)
         ? action.payload?.data
         : [];
+    });
+    builder.addCase(handleGetProduct.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleGetProduct.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleGetProduct.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+      state.product = action.payload ?? {};
     });
     //#################################################################
     builder.addCase(handleCreateProduct.pending, (state, action) => {
@@ -81,6 +93,16 @@ export const handleGetProducts = createAsyncThunk(
   async () => {
     const response = await GuestRequest.get("products");
     return { data: response.data };
+  }
+);
+
+export const handleGetProduct = createAsyncThunk(
+  "products/handleGetProduct",
+  async (data = {}) => {
+    const response = await GuestRequest.get("products", {
+      params: data,
+    });
+    return response.data;
   }
 );
 

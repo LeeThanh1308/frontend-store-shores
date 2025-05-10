@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import Toastify from "@/components/sections/Toastify";
 import axios from "axios";
+import { handleClearCart } from "../redux/Slices/carts";
 import { handleLogoutState } from "../redux/Slices/auth";
 import store from "../redux/store";
 
@@ -10,6 +11,10 @@ const AuthRequest = axios.create({
 
 const refreshToken = (config) => {
   return new Promise(async (resolve, reject) => {
+    const Token = await Cookies.get(process.env.NEXT_PUBLIC_TOKEN_KEY);
+    if (Token) {
+      resolve(config);
+    }
     axios
       .post(`${process.env.NEXT_PUBLIC_DOMAIN_API}accounts/refresh`, null, {
         withCredentials: true,
@@ -29,30 +34,24 @@ const refreshToken = (config) => {
         if (e?.response?.status === 403) {
           Toastify(0, "Phiên đăng nhập đã hết hạn vui lòng đăng nhập lại.");
           store.dispatch(handleLogoutState());
+          store.dispatch(handleClearCart());
         }
         reject(config);
       });
   });
 };
 
-AuthRequest.interceptors.request.use(
-  async function (config) {
-    // Do something before request is sent
+AuthRequest.interceptors.request.use(async function (config) {
+  // Do something before request is sent
 
-    const Token = Cookies.get(process.env.NEXT_PUBLIC_TOKEN_KEY);
-    if (!Token) {
-      return await refreshToken(config);
-    } else {
-      config.headers.Authorization = "Bearer " + Token;
-      return config;
-    }
-  },
-  function (error) {
-    // Do something with request error
-
-    return Promise.reject(error);
+  const Token = Cookies.get(process.env.NEXT_PUBLIC_TOKEN_KEY);
+  if (!Token) {
+    return await refreshToken(config);
+  } else {
+    config.headers.Authorization = "Bearer " + Token;
+    return config;
   }
-);
+});
 
 // Add a response interceptor
 AuthRequest.interceptors.response.use(

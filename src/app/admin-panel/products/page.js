@@ -883,7 +883,7 @@ function Products() {
                           <UploadImages
                             aspect={1 / 1}
                             quanlity={50}
-                            onDelete={(value) => {
+                            onDelete={(value = []) => {
                               const { images = [], ...rest } =
                                 watch("removes") ?? {};
                               if (Array.isArray(watch("images"))) {
@@ -902,24 +902,28 @@ function Products() {
                               }
                             }}
                             getData={(value) => {
+                              const filterValue = value.filter((_) => {
+                                if (_.uid) return _;
+                              });
                               clearErrors("colors");
                               const colors = watch("colors");
                               const { files, ...rest } = colors[index];
                               colors.splice(index, 1, {
                                 ...rest,
-                                files: value,
+                                files: filterValue,
                               });
                               setValue("colors", colors);
                             }}
                             restImage={(value) => {
-                              clearErrors("colors");
-                              const colors = watch("colors");
-                              const { files, ...rest } = colors[index];
-                              colors.splice(index, 1, {
-                                ...rest,
-                                files: value,
-                              });
-                              setValue("colors", colors);
+                              console.log(value);
+                              // clearErrors("colors");
+                              // const colors = watch("colors");
+                              // const { files, ...rest } = colors[index];
+                              // colors.splice(index, 1, {
+                              //   ...rest,
+                              //   files: value,
+                              // });
+                              // setValue("colors", colors);
                             }}
                             defaultDataUrl={
                               Array.isArray(watch("images"))

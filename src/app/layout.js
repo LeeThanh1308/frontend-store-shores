@@ -3,6 +3,7 @@ import "./globals.css";
 import { Dancing_Script, Great_Vibes, Roboto } from "next/font/google";
 
 import BootStrapApp from "@/services/redux/BootstrapApp";
+import LoginRequiredPrompt from "@/components/auth/LoginRequiredPrompt";
 import StoreProvider from "@/services/redux/StoreProvider";
 import { ToastContainer } from "react-toastify";
 
@@ -34,6 +35,7 @@ export default function RootLayout({ children }) {
       >
         <StoreProvider>
           {children}
+          <LoginRequiredPrompt />
           <BootStrapApp />
           <ToastContainer />
         </StoreProvider>

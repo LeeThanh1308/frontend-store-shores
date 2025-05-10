@@ -1,4 +1,9 @@
 import {
+  handleChangeMyPass,
+  handleGetInfoMyUser,
+  handleUpdateInfoMyUser,
+} from "./userApi";
+import {
   handleCreateAccountVerify,
   handleGetInfoVerifyCodeSign,
 } from "./registerApi";
@@ -16,6 +21,7 @@ const initialState = {
   user: {},
   role: undefined,
   isAuthenticated: false,
+  isShowLoginRequiredPrompt: false,
   isLoading: false,
   validators: {},
   onRefresh: false,
@@ -66,6 +72,9 @@ const authSlice = createSlice({
       state.role = null;
       state.isAuthenticated = false;
       Cookies.remove(process.env.NEXT_PUBLIC_TOKEN_KEY);
+    },
+    handleToggleLoginRequiredPrompt(state) {
+      state.isShowLoginRequiredPrompt = !state.isShowLoginRequiredPrompt;
     },
   },
   extraReducers: (builder) => {
@@ -189,7 +198,6 @@ const authSlice = createSlice({
       Cookies.remove(process.env.NEXT_PUBLIC_TOKEN_KEY);
     });
     //#################################################################
-
     builder.addCase(handleForgotPassword.pending, (state, action) => {
       state.isLoading = true;
     });
@@ -199,6 +207,46 @@ const authSlice = createSlice({
     builder.addCase(handleForgotPassword.fulfilled, (state, action) => {
       state.isLoading = false;
       state.forgetPassState = action.payload;
+    });
+    //#################################################################
+    builder.addCase(handleGetInfoMyUser.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleGetInfoMyUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+    });
+    builder.addCase(handleGetInfoMyUser.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+      state.user = action.payload;
+    });
+    //#################################################################
+    builder.addCase(handleUpdateInfoMyUser.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleUpdateInfoMyUser.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleUpdateInfoMyUser.fulfilled, (state, action) => {
+      Toastify(1, action?.payload?.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+    //#################################################################
+    builder.addCase(handleChangeMyPass.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleChangeMyPass.rejected, (state, action) => {
+      state.isLoading = false;
+      state.validators = action.payload?.validators ?? {};
+    });
+    builder.addCase(handleChangeMyPass.fulfilled, (state, action) => {
+      Toastify(1, action?.payload?.message);
+      state.isLoading = false;
+      state.isAuthenticated = false;
+      state.role = undefined;
+      state.user = {};
     });
     //#################################################################
   },
@@ -252,6 +300,7 @@ export const {
   handleChangeLoading,
   handleChangeForgetPassState,
   handleLogoutState,
+  handleToggleLoginRequiredPrompt,
 } = authSlice.actions;
 export const authSelector = (store) => store.auth;
 export const authReducer = authSlice.reducer;

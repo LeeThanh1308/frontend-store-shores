@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const handleConvertPrice = (price) => {
   return Number(price).toLocaleString("vi-VN", {
     style: "currency",
@@ -69,20 +71,32 @@ export function formartHouseMinutesSeconds(seconds) {
 }
 
 export function timeDifference(dateString) {
-  const givenDate = moment(dateString);
   const currentDate = moment();
+  const givenDate = moment(dateString);
 
   const years = currentDate.diff(givenDate, "years");
-  givenDate.add(years, "years"); // Cộng số năm vào để tiếp tục tính tháng
+  givenDate.add(years, "years");
 
   const months = currentDate.diff(givenDate, "months");
-  givenDate.add(months, "months"); // Cộng số tháng vào để tiếp tục tính ngày
+  givenDate.add(months, "months");
 
   const days = currentDate.diff(givenDate, "days");
+  givenDate.add(days, "days");
+
+  const hours = currentDate.diff(givenDate, "hours");
+  givenDate.add(hours, "hours");
+
+  const minutes = currentDate.diff(givenDate, "minutes");
+  givenDate.add(minutes, "minutes");
+
+  const seconds = currentDate.diff(givenDate, "seconds");
 
   if (years > 0) return `${years} năm trước`;
   if (months > 0) return `${months} tháng trước`;
   if (days > 0) return `${days} ngày trước`;
+  if (hours > 0) return `${hours} giờ trước`;
+  if (minutes > 0) return `${minutes} phút trước`;
+  return `${seconds} giây trước`;
 }
 
 export function capitalizeFirstLetter(str) {
@@ -91,7 +105,7 @@ export function capitalizeFirstLetter(str) {
 }
 
 export function capitalizeWords(str) {
-  return str
+  return String(str ?? "")
     .split(" ")
     .map((word) => capitalizeFirstLetter(word))
     .join(" ");

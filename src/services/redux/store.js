@@ -4,13 +4,17 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 
 import { authReducer } from "./Slices/auth";
+import { blogsReducer } from "./Slices/blogs";
 import { bootstrapReducer } from "./Slices/bootstrap";
 import { branchesReducer } from "./Slices/branches";
 import { brandsReducer } from "./Slices/brands";
 import { cartsReducer } from "./Slices/carts";
 import { categoryReducer } from "./Slices/categories";
 import { colorsReducer } from "./Slices/colors";
+import { commentsReducer } from "./Slices/comments";
 import { encryptTransform } from "redux-persist-transform-encrypt";
+import { likesReducer } from "./Slices/likes";
+import { ordersReducer } from "./Slices/orders";
 import { productsReducer } from "./Slices/products";
 import { searchReducer } from "./Slices/search";
 import { sizesReducer } from "./Slices/sizes";
@@ -55,6 +59,10 @@ const rootReducer = combineReducers({
   carts: cartsReducer,
   users: usersReducer,
   sliders: sliderReducer,
+  blogs: blogsReducer,
+  comments: commentsReducer,
+  likes: likesReducer,
+  orders: ordersReducer,
 });
 
 const store = configureStore({

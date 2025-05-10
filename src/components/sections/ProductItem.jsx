@@ -1,21 +1,24 @@
 "use client";
 
-import { ConfigProvider, Rate } from "antd";
-import { FaRegHeart, FaStar } from "react-icons/fa";
 import { generateUrlImage, handleConvertPrice } from "@/services/utils";
 
-import { GoHeartFill } from "react-icons/go";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-function ProductItem({ showTypes = false, data = {}, key = "" }) {
+function ProductItem({
+  showTypes = false,
+  data = {},
+  key = "ProductItem-x",
+  ...props
+}) {
   const [imageActive, setImageActive] = useState(0);
 
   return (
     <div
       key={key}
       className="font-dancing-script flex flex-col text-rose-500 text-xl rounded-xl bg-white shadow-md hover:shadow-lg shadow-black/25 transition-shadow space-y-2 relative overflow-hidden"
+      {...props}
     >
       {Number(data?.discount) > 0 && (
         <div className=" absolute top-0 left-0 px-3 py-0.5 z-20 bg-rose-500 rounded-br-xl text-sm font-roboto font-bold text-white">

@@ -40,11 +40,12 @@ function UploadImages({
           defaultDataUrl.map(async (it, ix) => {
             const file = await urlToFile(
               `${process.env.NEXT_PUBLIC_DOMAIN_API}${process.env.NEXT_PUBLIC_PARAM_GET_FILE_API}${it}`,
-              "image.jpg"
+              false
             );
             return {
               uid: `${-ix - 1}${it}`,
               name: it,
+              upload: false,
               status: "done",
               originFileObj: file,
               thumbUrl: URL.createObjectURL(file),
@@ -133,34 +134,31 @@ function UploadImages({
       >
         {title}
       </p>
-      {/* <ImgCrop aspect={aspect} quality={quanlity}> */}
-      <Upload
-        listType={listType}
-        maxCount={quanlity}
-        className="w-fit"
-        fileList={fileList}
-        onChange={(data) => {
-          onChange(data);
-        }}
-        onPreview={onPreview}
-        customRequest={(options) => {
-          const { file, onSuccess, onError } = options;
-          onSuccess(file, file);
-        }}
-      >
-        <p>
-          {fileList.length < quanlity ? (
-            ["picture"].includes(listType) ? (
-              <Button icon={<UploadOutlined />}>{placeholder}</Button>
+      <ImgCrop aspect={aspect} quality={quanlity}>
+        <Upload
+          listType={listType}
+          maxCount={quanlity}
+          className="w-fit"
+          fileList={fileList}
+          onChange={(data) => {
+            onChange(data);
+          }}
+          onPreview={onPreview}
+          customRequest={(options) => {
+            const { file, onSuccess, onError } = options;
+            onSuccess(file, file);
+          }}
+        >
+          {fileList.length < +quanlity &&
+            (["picture"].includes(listType) ? (
+              <p>
+                <Button icon={<UploadOutlined />}>{placeholder}</Button>
+              </p>
             ) : (
               placeholder
-            )
-          ) : (
-            ""
-          )}
-        </p>
-      </Upload>
-      {/* </ImgCrop> */}
+            ))}
+        </Upload>
+      </ImgCrop>
       {warn && (
         <p className="text-rose-700 indent-1 warn w-full mb-1 text-start text-sm">
           {warn}

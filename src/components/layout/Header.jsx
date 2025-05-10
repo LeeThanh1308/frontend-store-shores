@@ -29,9 +29,9 @@ function Header() {
   const { user, isAuthenticated, role } = useSelector(authSelector);
   const [valueSearch, setValueSearch] = useState();
   return (
-    <div>
+    <div className="relative">
       <Responsive
-        className={"flex justify-between items-center py-0.5 px-24 relative"}
+        className={" flex justify-between items-center py-0.5 px-24 relative"}
       >
         <div className="relative flex justify-center z-10">
           <Link href={"/"}>
@@ -87,9 +87,9 @@ function Header() {
             <ul className=" list-none flex-center flex-wrap gap-8 font-bold text-lg font-dancing-script text-rose-700">
               <li className=" hover:underline cursor-pointer relative group">
                 <h1>Giày</h1>
-                <div className=" absolute top-full -left-0 min-w-70 backdrop-blur-xl rounded-md z-50 overflow-hidden p-2 text-white hidden group-hover:block">
+                <div className=" absolute top-full -left-0 min-w-70 backdrop-blur-xl rounded-md z-50 overflow-hidden p-2 text-rose-700 hidden group-hover:block">
                   {categories.map((_) => (
-                    <Link key={_.id} href={`search?category=${_.name}`}>
+                    <Link key={_.id} href={`/search?category=${_.name}`}>
                       <div className="p-2 rounded-md hover:bg-black/30 hover:text-white hover:font-dancing-script">
                         <p className="text-shadow">{_.name}</p>
                       </div>
@@ -104,7 +104,7 @@ function Header() {
               ))}
               <li className=" hover:underline cursor-pointer relative group">
                 <h1>Thương hiệu</h1>
-                <div className=" absolute top-full -left-0 min-w-70 backdrop-blur-xl rounded-md z-50 overflow-hidden p-2 text-white hidden group-hover:block">
+                <div className=" absolute top-full -left-0 min-w-70 backdrop-blur-xl rounded-md z-50 overflow-hidden p-2 text-rose-700 hidden group-hover:block">
                   {brands.map((_) => (
                     <Link key={_.id} href={`/search?brand=${_.name}`}>
                       <div className="p-2 rounded-md hover:bg-black/30 hover:text-white hover:font-dancing-script flex justify-between items-center gap-4">
@@ -124,7 +124,7 @@ function Header() {
               </li>
 
               <li className=" hover:underline cursor-pointer relative group">
-                <Link href={"/blog"}>
+                <Link href={"/blogs"}>
                   <h1>Blog</h1>
                 </Link>
               </li>
@@ -158,14 +158,7 @@ function Header() {
                 </div>
               </div>
             </div>
-            {/* <div className=" p-1 hover:shadow-sm shadow-blue-700 rounded-full cursor-pointer">
-              <div className=" relative">
-                <GoHeartFill className="z-0 text-rose-500" size={24} />
-                <span className="z-10 absolute -right-2.5 -top-2.5 w-5 h-5 bg-sky-50/60 font-bold text-sm rounded-full shadow-sm shadow-blue-500 text-rose-500 flex-center">
-                  0
-                </span>
-              </div>
-            </div> */}
+
             <div className=" p-1 hover:shadow-sm shadow-blue-700 rounded-full cursor-pointer group">
               <div className=" relative z-50">
                 <FaCartPlus
@@ -175,11 +168,11 @@ function Header() {
                 <span className="z-10 absolute -right-2.5 -top-2.5 w-5 h-5 bg-sky-50/60 font-bold text-sm rounded-full shadow-sm shadow-blue-500 text-rose-500 flex-center">
                   {carts?.items?.length ?? 0}
                 </span>
-                <div className=" absolute right-0 top-full w-[500px] hidden group-hover:block">
+                <div className=" absolute right-0 top-full min-w-[500px] hidden group-hover:block">
                   <div className=" flex flex-col">
                     <div className="self-end w-0 h-0 mr-1 border-l-6 border-r-6 border-b-8 border-transparent border-b-rose-700"></div>
                     <div className=" w-full shadow shadow-rose-700 p-3 rounded-sm bg-white">
-                      {!carts?.items ? (
+                      {!carts?.items?.length ? (
                         <p className="text-center font-great font-bold text-blue-700">
                           Giỏ hàng trống!
                         </p>
@@ -190,10 +183,9 @@ function Header() {
                           </div>
                           <div className="w-full h-full">
                             <div className="text-sm text-gray-500 text-center flex">
-                              <div className="w-3/6 text-start">SẢN PHẨM</div>
-                              <div className="w-1/6 text-start">ĐƠN GIÁ</div>
-                              <div className="w-1/6 text-center">SỐ LƯỢNG</div>
-                              <div className="w-1/6 text-end">SỐ TIỀN</div>
+                              <div className="w-3/5 text-start">SẢN PHẨM</div>
+                              <div className="w-1/5 text-center">Đơn giá</div>
+                              <div className="w-1/5 text-end">SỐ TIỀN</div>
                             </div>
                             {/* Content */}
                             {carts?.items?.map((_, index) => (
@@ -202,7 +194,7 @@ function Header() {
                                 key={index}
                               >
                                 <div
-                                  className="w-3/6 flex items-center"
+                                  className="w-3/5 flex items-center"
                                   key={index}
                                 >
                                   <Image
@@ -215,18 +207,18 @@ function Header() {
                                   />
                                   <div className="truncate w-3/5 ...">
                                     <div className="">{_.name}</div>
-                                    <div>Size: {_.size.type}</div>
+                                    <div>
+                                      Size: {_.size.type}
+                                      <span className="font-bold text-gray-900 text-md">
+                                        x{_.quantity} {_?.color?.name}
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
-                                <div className="w-1/6 text-center text-rose-500">
+                                <div className="w-1/5 text-center text-rose-500">
                                   {formatCurrencyVND(_.sellingPrice)}
                                 </div>
-                                <div className="w-1/6 text-center flex justify-center items-center">
-                                  <div className="text-2xl text-gray-500">
-                                    x{_.quantity}
-                                  </div>
-                                </div>
-                                <div className="w-1/6 text-end text-green-500">
+                                <div className="w-1/5 text-end text-green-500">
                                   {formatCurrencyVND(
                                     _.sellingPrice *
                                       _.quantity *
@@ -254,41 +246,43 @@ function Header() {
                 <div className=" relative z-50 group">
                   <div className=" w-12 h-12 rounded-full overflow-hidden relative">
                     <FallbackImage
-                      src={`${process.env.NEXT_PUBLIC_DOMAIN_API}${process.env.NEXT_PUBLIC_PARAM_GET_FILE_API}${user?.avatar}`}
+                      src={user?.avatar ? generateUrlImage(user?.avatar) : ""}
                       layout="fill"
                       alt="logo"
                     />
                   </div>
                   <div className="absolute top-full right-0 w-96 hidden group-hover:block pt-4">
-                    <div className="shadow-sm shadow-slate-400 text-white font-dancing-script font-bold backdrop-blur-xl rounded-md z-20 px-4 pb-4">
+                    <div className="shadow-sm shadow-slate-400 bg-white text-rose-500 font-dancing-script font-bold backdrop-blur-xl rounded-md z-20 p-4">
                       <div className="w-full h-24 rounded-md shadow flex items-center mb-3 image-shadow">
                         <div className="w-12 h-12 rounded-full mr-3 ml-3 relative overflow-hidden">
                           <FallbackImage
-                            src={`${process.env.NEXT_PUBLIC_DOMAIN_API}${process.env.NEXT_PUBLIC_PARAM_GET_FILE_API}${user?.avatar}`}
+                            src={
+                              user?.avatar ? generateUrlImage(user?.avatar) : ""
+                            }
                             layout="fill"
                             alt="logo"
                           />
                         </div>
                         <div className=" font-dancing-script">
-                          <div className=" font-bold text-lg flex items-center gap-1 text-white">
+                          <div className=" font-bold text-lg flex items-center gap-1 text-shadow">
                             <span>{user?.fullname}</span>
                             <FaCircleCheck className="text-sky-500 text-xs" />
                           </div>
-                          <div className="text-sm text-white flex items-center">
+                          <div className="text-sm flex items-center text-shadow">
                             {role}
                           </div>
                         </div>
                       </div>
                       {role === "CEO" || role === "MANAGE" ? (
-                        <Link href="/dashboard">
+                        <Link href="/admin-panel/dashboard">
                           <div className="w-full h-12 pl-4 flex items-center hover:bg-black rounded-md hover:text-white cursor-pointer hover:font-bold border mb-1 text-shadow">
                             Trang quản trị
                           </div>
                         </Link>
                       ) : null}
-                      <Link href="/history">
+                      <Link href="/orders">
                         <div className="w-full h-12 pl-4 flex items-center hover:bg-black rounded-md hover:text-white cursor-pointer hover:font-bold border mb-1 text-shadow">
-                          Lịch sử mua hàng
+                          Đơn hàng của bạn
                         </div>
                       </Link>
                       <Link href="/cart">

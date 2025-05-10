@@ -22,7 +22,7 @@ function FormPopup({
       <div className=" fixed top-0 right-0 left-0 bottom-0 backdrop-blur-xl z-40 flex justify-center items-center">
         <div
           className={`w-1/3 bg-white backdrop-blur-2xl mx-auto p-6 relative shadow-lg shadow-black rounded-xl ${
-            showFull && `w-full`
+            showFull && `w-full !h-screen`
           }`}
         >
           <div className="w-full text-slate-950">

@@ -1,3 +1,5 @@
+"use client";
+
 import { memo, useState } from "react";
 
 import Image from "next/image";
@@ -9,7 +11,6 @@ const FallbackImage = ({
   ...props
 }) => {
   const [error, setError] = useState(false);
-
   return (
     <Image
       src={error ? fallback : src}

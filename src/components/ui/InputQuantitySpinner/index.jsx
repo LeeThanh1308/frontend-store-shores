@@ -9,6 +9,7 @@ function InputQuantitySpinner({
   max = 999,
   onOption = () => {},
 }) {
+  console.table({ min, max, defaultValue });
   const [quantity, setQuantity] = useState(1);
 
   const handleChangeQuantity = (value) => {
@@ -57,8 +58,8 @@ function InputQuantitySpinner({
           className=" w-full h-full outline-none px-2 text-center text-black py-1"
           value={quantity}
           type="number"
-          min={min}
-          max={max}
+          min={typeof min == "number" ? min : 0}
+          max={typeof max == "number" ? max : 0} // fallback hợp lệ nếu max chưa có
           onChange={(e) => handleChangeInput(+e.target.value)}
         />
       </div>

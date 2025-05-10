@@ -54,6 +54,7 @@ const cartsSlice = createSlice({
       state.isLoading = false;
     });
     builder.addCase(handleUpdateCart.fulfilled, (state, action) => {
+      Toastify(1, action.payload?.message);
       state.isLoading = false;
       state.onRefresh = true;
     });
@@ -85,7 +86,7 @@ export const handleCreateCart = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await AuthRequest.post("carts", data);
-      return { data: response.data };
+      return response.data;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error.response?.data || "Request failed");
@@ -112,7 +113,7 @@ export const handleUpdateCart = createAsyncThunk(
   async ({ id, ...data }, { rejectWithValue }) => {
     try {
       const response = await AuthRequest.patch(`carts/${id}`, data);
-      return { data: response.data };
+      return response.data;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error.response?.data || "Request failed");

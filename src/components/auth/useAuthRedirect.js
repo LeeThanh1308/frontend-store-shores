@@ -12,13 +12,15 @@ export function useRequireAuth(Component) {
   return function RequireAuth() {
     const router = useRouter();
     const { isAuthenticated } = useSelector(authSelector);
-
-    useLayoutEffect(() => {
-      if (!isAuthenticated) {
+    if (!isAuthenticated) {
+      if (document.referrer) {
+        router.back();
+      } else {
         router.replace("/login");
       }
-    }, [isAuthenticated]);
-    return <Component />;
+    } else {
+      return <Component />;
+    }
   };
 }
 
@@ -27,13 +29,15 @@ export function useGuestOnly(Component) {
   return function GuestOnly() {
     const router = useRouter();
     const { isAuthenticated } = useSelector(authSelector);
-    console.log(isAuthenticated);
-    useLayoutEffect(() => {
-      if (isAuthenticated) {
+
+    if (isAuthenticated) {
+      if (document.referrer) {
+        router.back();
+      } else {
         router.replace("/");
       }
-    }, [isAuthenticated]);
-
-    return <Component />;
+    } else {
+      return <Component />;
+    }
   };
 }

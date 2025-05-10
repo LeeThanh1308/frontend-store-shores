@@ -2,6 +2,7 @@
 
 import "@ant-design/v5-patch-for-react-19";
 
+import { blogsSelector, handleGetBlogs } from "../Slices/blogs";
 import {
   bootstrapSelector,
   handleGetBootstrapBrands,
@@ -17,6 +18,7 @@ import {
 } from "../Slices/carts";
 import { categorySelector, handleGetCategories } from "../Slices/categories";
 import { colorsSelector, handleGetColors } from "../Slices/colors";
+import { commentsSelector, handleGetComments } from "../Slices/comments";
 import { handleGetListAccountCustomers, usersSelector } from "../Slices/users";
 import { handleGetProducts, productsSelector } from "../Slices/products";
 import { handleGetSearch, searchSelector } from "../Slices/search";
@@ -28,7 +30,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
 import { authSelector } from "../Slices/auth";
+import { handleGetInfoMyUser } from "../Slices/auth/userApi";
 import { handleGetInfoVerifyCodeSign } from "../Slices/auth/registerApi";
+import { likesSelector } from "../Slices/likes";
+import { ordersSelector } from "../Slices/orders";
 
 function BootStrapApp() {
   const params = useParams();
@@ -38,6 +43,7 @@ function BootStrapApp() {
   const { onRefresh: onRefreshBootstrap, isLoading: isLoadingBootstrap } =
     useSelector(bootstrapSelector);
   const {
+    onRefresh: onRefreshAuth,
     isLoading: isLoadingAuth,
     activeVerifyCodeSignID,
     isAuthenticated,
@@ -65,6 +71,12 @@ function BootStrapApp() {
     useSelector(usersSelector);
   const { onRefresh: onRefreshSliders, isLoading: isLoadingSliders } =
     useSelector(sliderSelector);
+  const { onRefresh: onRefreshBlogs, isLoading: isLoadingBlogs } =
+    useSelector(blogsSelector);
+  const { onRefresh: onRefreshComments, isLoading: isLoadingComments } =
+    useSelector(commentsSelector);
+  const { isLoading: isLoadingLikes } = useSelector(likesSelector);
+  const { isLoading: isLoadingOrders } = useSelector(ordersSelector);
 
   useEffect(() => {
     const timerID = setTimeout(() => {
@@ -76,11 +88,13 @@ function BootStrapApp() {
       if (onRefreshProducts) dispatch(handleGetProducts());
       if (onRefreshStores) dispatch(handleGetStores({ branchID: params?.id }));
       if (onRefreshSliders) dispatch(handleGetSliders());
+      if (onRefreshBlogs) dispatch(handleGetBlogs());
       if (isAuthenticated) {
         if (onRefreshCart) dispatch(handleGetCarts());
         if (onRefreshUsers) dispatch(handleGetListAccountCustomers());
+        if (onRefreshAuth) dispatch(handleGetInfoMyUser());
       }
-    }, 100);
+    }, 500);
 
     return () => clearTimeout(timerID);
   }, [
@@ -95,6 +109,8 @@ function BootStrapApp() {
     onRefreshCart,
     onRefreshUsers,
     onRefreshSliders,
+    onRefreshAuth,
+    onRefreshBlogs,
   ]);
 
   useEffect(() => {
@@ -112,7 +128,11 @@ function BootStrapApp() {
         isLoadingSearch ||
         isLoadingCart ||
         isLoadingUsers ||
-        isLoadingSliders
+        isLoadingSliders ||
+        isLoadingBlogs ||
+        isLoadingComments ||
+        isLoadingLikes ||
+        isLoadingOrders
       ) {
         setShowLoading(true);
       } else {
@@ -135,6 +155,10 @@ function BootStrapApp() {
     isLoadingCart,
     isLoadingUsers,
     isLoadingSliders,
+    isLoadingBlogs,
+    isLoadingComments,
+    isLoadingLikes,
+    isLoadingOrders,
   ]);
 
   useEffect(() => {
@@ -143,6 +167,9 @@ function BootStrapApp() {
     dispatch(handleGetBootstrapTargetGroups());
     if (isAuthenticated) {
       dispatch(handleGetCarts());
+      if (!user?.fullname) {
+        dispatch(handleGetInfoMyUser());
+      }
     }
   }, []);
 
@@ -160,6 +187,10 @@ function BootStrapApp() {
     //   redirect("/");
     // }
     if (isAuthenticated) {
+      dispatch(handleGetCarts());
+      if (!user?.fullname) {
+        dispatch(handleGetInfoMyUser());
+      }
     } else {
       dispatch(handleClearCart());
     }

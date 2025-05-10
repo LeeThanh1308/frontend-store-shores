@@ -16,19 +16,27 @@ import { usePathname } from "next/navigation";
 const initMenuItems = [
   {
     name: "Trang chủ",
-    path: "/dashboard",
+    path: "dashboard",
   },
   {
     name: "Quản trị tài khoản",
-    path: "/users",
+    path: "users",
   },
   {
     name: "Quản trị danh mục",
-    path: "/categories",
+    path: "categories",
+  },
+  {
+    name: "Quản trị bài viết",
+    path: "blogs",
+  },
+  {
+    name: "Quản trị đơn hàng",
+    path: "orders",
   },
   {
     name: "Quản lý sản phẩm",
-    path: "/products",
+    path: "products",
     subMenu: [
       {
         name: "Sản phẩm",
@@ -73,7 +81,7 @@ function AdminLayout({ children }) {
           ...initMenuItems,
           {
             name: "Quản trị chi nhánh",
-            path: "/branches",
+            path: "branches",
             subMenu: branches.map((_) => ({
               name: _.name,
               path: "/" + _.id,
