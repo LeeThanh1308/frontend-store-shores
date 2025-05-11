@@ -16,7 +16,11 @@ const initialState = {
 const ordersSlice = createSlice({
   name: "orders",
   initialState,
-  reducers: {},
+  reducers: {
+    handlePushOrders(state, action) {
+      state.orders.push(action.payload);
+    },
+  },
   extraReducers: (builder) => {
     //#################################################################
     builder.addCase(handleGetAdminOrders.pending, (state, action) => {
@@ -49,8 +53,10 @@ const ordersSlice = createSlice({
 
 export const handleGetAdminOrders = createAsyncThunk(
   "orders/handleGetAdminOrders",
-  async () => {
-    const response = await AuthRequest.get("payment/admin/orders");
+  async (data = {}) => {
+    const response = await AuthRequest.get("payment/admin/orders", {
+      params: data,
+    });
     return response.data;
   }
 );
@@ -68,6 +74,7 @@ export const handleUpdatedAdminOrders = createAsyncThunk(
   }
 );
 
+export const { handlePushOrders } = ordersSlice.actions;
 export const ordersSelector = (store) => store.orders;
 export const ordersReducer = ordersSlice.reducer;
 

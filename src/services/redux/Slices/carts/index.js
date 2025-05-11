@@ -6,6 +6,7 @@ const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
 const initialState = {
   carts: [],
+  cashiersCarts: [],
   isLoading: false,
   onRefresh: false,
   validators: {},
@@ -33,6 +34,18 @@ const cartsSlice = createSlice({
       state.carts = action.payload?.data;
     });
     //#################################################################
+    builder.addCase(handleGetCashiersCarts.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleGetCashiersCarts.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleGetCashiersCarts.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+      state.cashiersCarts = action.payload?.data;
+    });
+    //#################################################################
     builder.addCase(handleCreateCart.pending, (state, action) => {
       state.isLoading = true;
     });
@@ -41,6 +54,19 @@ const cartsSlice = createSlice({
       state.isLoading = false;
     });
     builder.addCase(handleCreateCart.fulfilled, (state, action) => {
+      Toastify(1, action.payload?.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+    //#################################################################
+    builder.addCase(handleCreateCashiersCarts.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleCreateCashiersCarts.rejected, (state, action) => {
+      state.validators = action.payload?.validators ?? {};
+      state.isLoading = false;
+    });
+    builder.addCase(handleCreateCashiersCarts.fulfilled, (state, action) => {
       Toastify(1, action.payload?.message);
       state.isLoading = false;
       state.onRefresh = true;
@@ -86,6 +112,27 @@ export const handleCreateCart = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await AuthRequest.post("carts", data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetCashiersCarts = createAsyncThunk(
+  "carts/handleGetCashiersCarts",
+  async () => {
+    const response = await AuthRequest.get("carts/cashiers");
+    return { data: response.data };
+  }
+);
+
+export const handleCreateCashiersCarts = createAsyncThunk(
+  "carts/handleCreateCashiersCarts",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.post("carts/cashiers", data);
       return response.data;
     } catch (error) {
       console.log(error);

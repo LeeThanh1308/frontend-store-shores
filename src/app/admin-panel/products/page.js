@@ -31,8 +31,10 @@ import { MdModeEdit } from "react-icons/md";
 import ProductTable from "@/components/pages/products/ProductTable";
 import SearchableDropdown from "@/components/ui/SearchableDropdown";
 import UploadImages from "@/components/sections/UploadImages";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import dynamic from "next/dynamic";
 import { useForm } from "react-hook-form";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const RichTextEditor = dynamic(
@@ -1194,4 +1196,4 @@ function Products() {
   );
 }
 
-export default Products;
+export default withRoleGuard(Products, [allowedRoles.CEO]);

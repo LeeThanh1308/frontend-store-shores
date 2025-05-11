@@ -40,7 +40,7 @@ function InputQuantitySpinner({
   }, [quantity]);
 
   useEffect(() => {
-    setQuantity(defaultValue);
+    if (defaultValue) setQuantity(defaultValue);
   }, [defaultValue]);
 
   return (

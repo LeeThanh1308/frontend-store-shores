@@ -3,6 +3,7 @@ const nextConfig = {
   experimental: {
     serverMinification: false,
   },
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       {

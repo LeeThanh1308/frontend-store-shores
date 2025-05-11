@@ -21,9 +21,11 @@ import FormPopup from "@/components/sections/FormPopup";
 import Highlighter from "react-highlight-words";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import { SearchOutlined } from "@ant-design/icons";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import { handleRegexSlug } from "@/services/utils";
 import { targetsSchema } from "@/services/schema/targetsSchema";
 import { useForm } from "react-hook-form";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function Targets() {
@@ -374,4 +376,4 @@ function Targets() {
   );
 }
 
-export default Targets;
+export default withRoleGuard(Targets, [allowedRoles.CEO]);

@@ -25,6 +25,7 @@ import Image from "next/image";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import { SearchOutlined } from "@ant-design/icons";
 import SearchableDropdown from "@/components/ui/SearchableDropdown";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import { handleRegexSlug } from "@/services/utils";
 import { useForm } from "react-hook-form";
 import { withRoleGuard } from "@/components/auth/withRoleGuard";
@@ -525,4 +526,4 @@ function CategoryPage() {
   );
 }
 
-export default CategoryPage;
+export default withRoleGuard(CategoryPage, [allowedRoles.CEO]);

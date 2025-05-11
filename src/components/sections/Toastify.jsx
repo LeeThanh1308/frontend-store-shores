@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 
-function Toastify(type, message) {
+function Toastify(type, message, config = {}) {
   switch (type) {
     case "info":
       toast.info(message, {
@@ -12,6 +12,7 @@ function Toastify(type, message) {
         draggable: true,
         progress: undefined,
         theme: "dark",
+        ...config,
       });
       break;
     case 1:
@@ -24,6 +25,7 @@ function Toastify(type, message) {
         draggable: true,
         progress: undefined,
         theme: "dark",
+        ...config,
       });
       break;
     case 0:

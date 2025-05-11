@@ -23,9 +23,11 @@ import Image from "next/image";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import RichTextEditor from "@/components/sections/RichTextEditor";
 import { SearchOutlined } from "@ant-design/icons";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import { blogSchema } from "@/services/schema/blogSchema";
 import { handleRegexSlug } from "@/services/utils";
 import { useForm } from "react-hook-form";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function BlogPage() {
@@ -442,4 +444,4 @@ function BlogPage() {
   );
 }
 
-export default BlogPage;
+export default withRoleGuard(BlogPage, [allowedRoles.CEO]);

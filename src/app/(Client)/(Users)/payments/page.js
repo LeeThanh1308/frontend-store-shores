@@ -14,11 +14,14 @@ import { authSelector } from "@/services/redux/Slices/auth";
 import axios from "axios";
 import { cartsSelector } from "@/services/redux/Slices/carts";
 import { formatCurrencyVND } from "@/services/utils";
+import { io } from "socket.io-client";
+import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 
 function PaymentPage() {
   const { user } = useSelector(authSelector);
   const { carts } = useSelector(cartsSelector);
+  const router = useRouter();
   const [dataForm, setDataForm] = useState({
     receiver: user?.fullname,
     phone: user?.phone,
@@ -163,13 +166,12 @@ function PaymentPage() {
           ...dataForm,
           address,
         }).then(() => {
+          router.push("/orders");
           Toastify(1, "Đặt hàng thành công.");
         });
       }
     }
   };
-
-  console.log(user);
   return (
     <Responsive>
       <div className="w-full h-full text-lg font-dancing-script">
@@ -192,7 +194,7 @@ function PaymentPage() {
                   }));
                   setDataForm((prev) => ({
                     ...prev,
-                    receiver: "",
+                    receiver: e.target.value,
                   }));
                 }}
               />

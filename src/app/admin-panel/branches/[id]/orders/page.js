@@ -77,7 +77,7 @@ function OrderPage() {
       setShowFormCreated(false);
       setShowFormUpdated(false);
       setIdThisUpdated(undefined);
-      dispatch(handleGetAdminOrders());
+      dispatch(handleGetAdminOrders({ filter: activeOptions }));
     }
   }, [onRefresh]);
 
@@ -426,4 +426,8 @@ function OrderPage() {
   );
 }
 
-export default withRoleGuard(OrderPage, [allowedRoles.CEO]);
+export default withRoleGuard(OrderPage, [
+  allowedRoles.CEO,
+  allowedRoles.MANAGE,
+  allowedRoles.STAFF,
+]);

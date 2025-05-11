@@ -273,8 +273,14 @@ function Header() {
                           </div>
                         </div>
                       </div>
-                      {role === "CEO" || role === "MANAGE" ? (
-                        <Link href="/admin-panel/dashboard">
+                      {role == "CEO" || role == "MANAGE" || role == "STAFF" ? (
+                        <Link
+                          href={
+                            role == "CEO"
+                              ? "/admin-panel/dashboard"
+                              : "/admin-panel"
+                          }
+                        >
                           <div className="w-full h-12 pl-4 flex items-center hover:bg-black rounded-md hover:text-white cursor-pointer hover:font-bold border mb-1 text-shadow">
                             Trang quản trị
                           </div>

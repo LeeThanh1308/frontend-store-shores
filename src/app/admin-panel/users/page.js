@@ -28,8 +28,10 @@ import FallbackImage from "@/components/ui/FallbackImage";
 import FormPopup from "@/components/sections/FormPopup";
 import Highlighter from "react-highlight-words";
 import Toastify from "@/components/sections/Toastify";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import moment from "moment";
 import { useForm } from "react-hook-form";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function UserPage() {
@@ -718,4 +720,4 @@ function UserPage() {
   );
 }
 
-export default UserPage;
+export default withRoleGuard(UserPage, [allowedRoles.CEO]);

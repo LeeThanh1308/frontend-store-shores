@@ -1,8 +1,9 @@
 "use client";
 
+import { authSelector, handleLogoutState } from "@/services/redux/Slices/auth";
 import {
   branchesSelector,
-  handleGetBranches,
+  handleGetThisBranches,
 } from "@/services/redux/Slices/branches";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -10,33 +11,45 @@ import { useEffect, useState } from "react";
 import { FaLeftLong } from "react-icons/fa6";
 import FallbackImage from "../ui/FallbackImage";
 import Link from "next/link";
-import { authSelector } from "@/services/redux/Slices/auth";
+import { allowedRoles } from "@/services/utils/allowedRoles";
+import { handleLogout } from "@/services/redux/Slices/auth/loginApi";
 import { usePathname } from "next/navigation";
 
 const initMenuItems = [
   {
     name: "Trang chủ",
     path: "dashboard",
+    roles: [allowedRoles.CEO],
+  },
+  {
+    name: "Trang thu ngân",
+    path: "/",
+    roles: [allowedRoles.CEO, allowedRoles.MANAGE, allowedRoles.STAFF],
   },
   {
     name: "Quản trị tài khoản",
     path: "users",
+    roles: [allowedRoles.CEO],
   },
   {
     name: "Quản trị danh mục",
     path: "categories",
+    roles: [allowedRoles.CEO],
   },
   {
     name: "Quản trị bài viết",
     path: "blogs",
+    roles: [allowedRoles.CEO],
   },
   {
     name: "Quản trị đơn hàng",
     path: "orders",
+    roles: [allowedRoles.CEO],
   },
   {
     name: "Quản lý sản phẩm",
     path: "products",
+    roles: [allowedRoles.CEO],
     subMenu: [
       {
         name: "Sản phẩm",
@@ -62,7 +75,7 @@ function AdminLayout({ children }) {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const [menuItems, setMenuItems] = useState(initMenuItems);
-  const { branches = [] } = useSelector(branchesSelector);
+  const { thisBranches = [] } = useSelector(branchesSelector);
   const { user, role } = useSelector(authSelector);
   const [showMenu, setShowMenu] = useState(false);
   const [dataForm, setDataForm] = useState({
@@ -74,15 +87,15 @@ function AdminLayout({ children }) {
 
   useEffect(() => {
     const timerID = setTimeout(() => {
-      if (branches?.length == 0) {
-        dispatch(handleGetBranches());
+      if (thisBranches?.length == 0) {
+        dispatch(handleGetThisBranches());
       } else {
         setMenuItems([
           ...initMenuItems,
           {
             name: "Quản trị chi nhánh",
             path: "branches",
-            subMenu: branches.map((_) => ({
+            subMenu: thisBranches?.map((_) => ({
               name: _.name,
               path: "/" + _.id,
             })),
@@ -91,7 +104,7 @@ function AdminLayout({ children }) {
       }
     }, 200);
     return () => clearTimeout(timerID);
-  }, [branches?.length]);
+  }, [thisBranches?.length]);
   return (
     <div className="w-full h-full relative" onClick={() => setShowMenu(false)}>
       {!showMenu ? (
@@ -104,23 +117,17 @@ function AdminLayout({ children }) {
         ></div>
       ) : (
         <div className="showheader fixed top-0 left-0 right-0 bottom-0 z-50">
-          <div className="w-full h-14 bg-sky-500 flex justify-between items-center">
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            className="w-full h-14 bg-sky-500 flex justify-between items-center"
+          >
             <div className="h-full w-1/6 flex items-center justify-center bg-sky-600">
               <h1>Trang quản trị</h1>
             </div>
             <div className="flex w-5/6 justify-between items-center">
               <div className="flex">
-                <div>
-                  <div
-                    className="cursor-pointer h-full flex justify-center items-center hover:text-slate-950 hover:bg-white"
-                    onClick={() => Navigate(-1)}
-                  >
-                    <div className=" px-6">
-                      <FaLeftLong icon="text-2xl" />
-                    </div>
-                  </div>
-                </div>
-
                 <Link
                   activeclassname="active"
                   href="/"
@@ -132,21 +139,25 @@ function AdminLayout({ children }) {
                 </Link>
               </div>
               <div className="flex items-center mr-4">
-                <Link href={"/logout"}>
-                  <div className="cursor-pointer rounded-full flex justify-center items-center hover:opacity-50">
-                    <div className="mx-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        alt="Logout"
-                        height="1em"
-                        viewBox="0 0 512 512"
-                      >
-                        {/* Đặt dữ liệu SVG logout ở đây */}
-                      </svg>
-                    </div>
-                    <div>Đăng xuất</div>
+                <div
+                  onClick={() => {
+                    dispatch(handleLogout());
+                    dispatch(handleLogoutState());
+                  }}
+                  className="cursor-pointer rounded-full flex justify-center items-center hover:opacity-50"
+                >
+                  <div className="mx-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      alt="Logout"
+                      height="1em"
+                      viewBox="0 0 512 512"
+                    >
+                      {/* Đặt dữ liệu SVG logout ở đây */}
+                    </svg>
                   </div>
-                </Link>
+                  <div>Đăng xuất</div>
+                </div>
               </div>
             </div>
           </div>
@@ -174,48 +185,99 @@ function AdminLayout({ children }) {
               Quản trị
             </div>
             <ul>
-              {menuItems.map((_, index) => (
-                <li
-                  key={index}
-                  onMouseEnter={(e) => {
-                    setShowSubMenu(index);
-                  }}
-                  onMouseLeave={(e) => {
-                    setShowSubMenu(false);
-                  }}
-                >
-                  <Link
-                    href={_.path}
-                    className={`w-full pl-8 flex py-2 cursor-pointer hover:font-dancing-script hover:text-rose-500 hover:underline ${
-                      pathname.split("/").includes(_.path.replace("/", "")) &&
-                      `font-dancing-script font-bold text-rose-700 text-2xl`
-                    }`}
-                  >
-                    {_.name}
-                  </Link>
-                  {index === showSubMenu && (
-                    <ul className="menu">
-                      {Array.isArray(_.subMenu) &&
-                        _.subMenu.map((subIt, subIndex) => (
-                          <li
-                            key={subIndex}
-                            className="hover:font-dancing-script hover:text-rose-500 hover:underline"
-                          >
-                            <Link
-                              href={_.path + subIt?.path}
-                              className={`w-full pl-16 flex py-2 cursor-pointer ${
-                                subIt.path === pathname &&
-                                `active font-dancing-script font-bold text-rose-700 text-2xl`
-                              }`}
-                            >
-                              {subIt.name}
-                            </Link>
-                          </li>
-                        ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
+              {menuItems.map((_, index) => {
+                if (Array.isArray(_.roles) && _.roles.includes(role)) {
+                  return (
+                    <li
+                      key={index}
+                      onMouseEnter={(e) => {
+                        setShowSubMenu(index);
+                      }}
+                      onMouseLeave={(e) => {
+                        setShowSubMenu(false);
+                      }}
+                    >
+                      <Link
+                        href={"/admin-panel/" + _.path}
+                        className={`w-full pl-8 flex py-2 cursor-pointer hover:font-dancing-script hover:text-rose-500 hover:underline ${
+                          pathname
+                            .split("/")
+                            .includes(_.path.replace("/", "")) &&
+                          `font-dancing-script font-bold text-rose-700 text-2xl`
+                        }`}
+                      >
+                        {_.name}
+                      </Link>
+                      {index === showSubMenu && (
+                        <ul className="menu">
+                          {Array.isArray(_.subMenu) &&
+                            _.subMenu.map((subIt, subIndex) => (
+                              <li
+                                key={subIndex}
+                                className="hover:font-dancing-script hover:text-rose-500 hover:underline"
+                              >
+                                <Link
+                                  href={"/admin-panel/" + _.path + subIt?.path}
+                                  className={`w-full pl-16 flex py-2 cursor-pointer ${
+                                    subIt.path === pathname &&
+                                    `active font-dancing-script font-bold text-rose-700 text-2xl`
+                                  }`}
+                                >
+                                  {subIt.name}
+                                </Link>
+                              </li>
+                            ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                } else if (!_?.roles) {
+                  return (
+                    <li
+                      key={index}
+                      onMouseEnter={(e) => {
+                        setShowSubMenu(index);
+                      }}
+                      onMouseLeave={(e) => {
+                        setShowSubMenu(false);
+                      }}
+                    >
+                      <Link
+                        href={"/admin-panel/" + _.path}
+                        className={`w-full pl-8 flex py-2 cursor-pointer hover:font-dancing-script hover:text-rose-500 hover:underline ${
+                          pathname
+                            .split("/")
+                            .includes(_.path.replace("/", "")) &&
+                          `font-dancing-script font-bold text-rose-700 text-2xl`
+                        }`}
+                      >
+                        {_.name}
+                      </Link>
+                      {index === showSubMenu && (
+                        <ul className="menu">
+                          {Array.isArray(_.subMenu) &&
+                            _.subMenu.map((subIt, subIndex) => (
+                              <li
+                                key={subIndex}
+                                className="hover:font-dancing-script hover:text-rose-500 hover:underline"
+                              >
+                                <Link
+                                  href={"/admin-panel/" + _.path + subIt?.path}
+                                  className={`w-full pl-16 flex py-2 cursor-pointer ${
+                                    subIt.path === pathname &&
+                                    `active font-dancing-script font-bold text-rose-700 text-2xl`
+                                  }`}
+                                >
+                                  {subIt.name}
+                                </Link>
+                              </li>
+                            ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                }
+              })}
             </ul>
           </div>
         </div>

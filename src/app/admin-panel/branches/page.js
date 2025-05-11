@@ -21,9 +21,11 @@ import FormPopup from "@/components/sections/FormPopup";
 import Highlighter from "react-highlight-words";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import { SearchOutlined } from "@ant-design/icons";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import { branchesSchema } from "@/services/schema/branchesSchema";
 import { handleRegexSlug } from "@/services/utils";
 import { useForm } from "react-hook-form";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function Branches() {
@@ -471,4 +473,4 @@ function Branches() {
   );
 }
 
-export default Branches;
+export default withRoleGuard(Branches, [allowedRoles.CEO]);

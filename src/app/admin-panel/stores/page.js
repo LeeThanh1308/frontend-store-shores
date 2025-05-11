@@ -21,9 +21,11 @@ import FormPopup from "@/components/sections/FormPopup";
 import Highlighter from "react-highlight-words";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import { SearchOutlined } from "@ant-design/icons";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import { handleRegexSlug } from "@/services/utils";
 import { storeSchema } from "@/services/schema/storesSchema";
 import { useForm } from "react-hook-form";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function Stores() {
@@ -467,4 +469,4 @@ function Stores() {
   );
 }
 
-export default Stores;
+export default withRoleGuard(Stores, [allowedRoles.CEO]);

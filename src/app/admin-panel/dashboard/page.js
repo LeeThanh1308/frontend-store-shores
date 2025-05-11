@@ -10,6 +10,8 @@ import Link from "next/link";
 import { MdOutlineCategory } from "react-icons/md";
 import RevenueStatisticCollums from "@/components/sections/RevenueStatisticCollums";
 import RevenueStatistics from "@/components/sections/RevenueStatistics";
+import { allowedRoles } from "@/services/utils/allowedRoles";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 
 function Page() {
   const [data, setData] = useState([]);
@@ -92,4 +94,4 @@ function Page() {
   );
 }
 
-export default Page;
+export default withRoleGuard(Page, [allowedRoles.CEO]);

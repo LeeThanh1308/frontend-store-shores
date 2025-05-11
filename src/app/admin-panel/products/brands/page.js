@@ -22,9 +22,11 @@ import Highlighter from "react-highlight-words";
 import Image from "next/image";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import { SearchOutlined } from "@ant-design/icons";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import { brandsSchema } from "@/services/schema/brandsSchema";
 import { handleRegexSlug } from "@/services/utils";
 import { useForm } from "react-hook-form";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function Brands() {
@@ -479,4 +481,4 @@ function Brands() {
   );
 }
 
-export default Brands;
+export default withRoleGuard(Brands, [allowedRoles.CEO]);

@@ -1,3 +1,4 @@
+import AuthRequest from "@/services/axios/AuthRequest";
 import GuestRequest from "@/services/axios/GuestRequest";
 import Toastify from "@/components/sections/Toastify";
 
@@ -6,6 +7,8 @@ const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 const initialState = {
   branch: [],
   branches: [],
+  thisBranches: [],
+  employees: [],
   isLoading: false,
   onRefresh: false,
   validators: {},
@@ -35,6 +38,17 @@ const branchesSlice = createSlice({
       state.branch = action.payload?.data;
     });
     //#################################################################
+    builder.addCase(handleGetEmployeesBranch.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleGetEmployeesBranch.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleGetEmployeesBranch.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.employees = action.payload;
+    });
+    //#################################################################
     builder.addCase(handleGetBranches.pending, (state, action) => {
       state.isLoading = true;
     });
@@ -45,6 +59,18 @@ const branchesSlice = createSlice({
       state.isLoading = false;
       state.onRefresh = false;
       state.branches = action.payload?.data;
+    });
+    //#################################################################
+    builder.addCase(handleGetThisBranches.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleGetThisBranches.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleGetThisBranches.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+      state.thisBranches = action.payload;
     });
     //#################################################################
     builder.addCase(handleCreateBranch.pending, (state, action) => {
@@ -76,6 +102,36 @@ const branchesSlice = createSlice({
       state.onRefresh = true;
     });
     //#################################################################
+    builder.addCase(handleSetRoleEmployees.pending, (state, action) => {
+      console.log("pending");
+      state.isLoading = true;
+    });
+    builder.addCase(handleSetRoleEmployees.rejected, (state, action) => {
+      Toastify(0, "Cập nhật quyền thất bại");
+      state.validators = action.payload?.validators ?? {};
+      state.isLoading = false;
+    });
+    builder.addCase(handleSetRoleEmployees.fulfilled, (state, action) => {
+      Toastify(action.payload?.type, action.payload.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+    //#################################################################
+    builder.addCase(handleDeleteRoleEmployees.pending, (state, action) => {
+      console.log("pending");
+      state.isLoading = true;
+    });
+    builder.addCase(handleDeleteRoleEmployees.rejected, (state, action) => {
+      Toastify(0, "Xóa quyền thất bại");
+      state.validators = action.payload?.validators ?? {};
+      state.isLoading = false;
+    });
+    builder.addCase(handleDeleteRoleEmployees.fulfilled, (state, action) => {
+      Toastify(action.payload?.type, action.payload.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+    //#################################################################
     builder.addCase(handleDeleteBranch.pending, (state, action) => {
       state.isLoading = true;
     });
@@ -95,6 +151,14 @@ export const handleGetBranches = createAsyncThunk(
   async () => {
     const response = await GuestRequest.get("branches");
     return { data: response.data };
+  }
+);
+
+export const handleGetThisBranches = createAsyncThunk(
+  "branches/handleGetThisBranches",
+  async () => {
+    const response = await AuthRequest.get("branches/this-branches");
+    return response.data;
   }
 );
 
@@ -150,6 +214,46 @@ export const handleUpadateBranch = createAsyncThunk(
       console.log(error);
       return rejectWithValue(error.response?.data || "Request failed");
     }
+  }
+);
+
+export const handleSetRoleEmployees = createAsyncThunk(
+  "branches/handleSetRoleEmployees",
+  async ({ branchID, userID, role }, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.patch(
+        `branches/${branchID}/employees/${userID}/${role}`
+      );
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteRoleEmployees = createAsyncThunk(
+  "branches/handleDeleteRoleEmployees",
+  async ({ userID }, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.delete(`branches/employees/${userID}`);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetEmployeesBranch = createAsyncThunk(
+  "branches/handleGetEmployeesBranch",
+  async (id) => {
+    const response = await GuestRequest.get(`branches/${id}/employees`, {
+      params: {
+        id: id,
+      },
+    });
+    return Array.isArray(response.data) ? response.data : [];
   }
 );
 

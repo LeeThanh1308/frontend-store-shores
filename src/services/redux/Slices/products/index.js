@@ -1,3 +1,4 @@
+import AuthRequest from "@/services/axios/AuthRequest";
 import GuestRequest from "@/services/axios/GuestRequest";
 import Toastify from "@/components/sections/Toastify";
 
@@ -6,6 +7,7 @@ const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 const initialState = {
   product: {},
   products: [],
+  search: [],
   isLoading: false,
   onRefresh: false,
   validators: {},
@@ -34,6 +36,7 @@ const productsSlice = createSlice({
         ? action.payload?.data
         : [];
     });
+    //#################################################################
     builder.addCase(handleGetProduct.pending, (state, action) => {
       state.isLoading = true;
     });
@@ -44,6 +47,18 @@ const productsSlice = createSlice({
       state.isLoading = false;
       state.onRefresh = false;
       state.product = action.payload ?? {};
+    });
+    //#################################################################
+    builder.addCase(handleFindProductByCashiers.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleFindProductByCashiers.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleFindProductByCashiers.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+      state.search = action.payload;
     });
     //#################################################################
     builder.addCase(handleCreateProduct.pending, (state, action) => {
@@ -189,6 +204,23 @@ export const handleUpdateProduct = createAsyncThunk(
       );
       const response = await GuestRequest.patch(`products/${id}`, formData);
       return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleFindProductByCashiers = createAsyncThunk(
+  "products/handleFindProductByCashiers",
+  async (search, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.get("products/cashiers", {
+        params: {
+          search,
+        },
+      });
+      return response.data;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error.response?.data || "Request failed");

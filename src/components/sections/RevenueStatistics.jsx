@@ -1,21 +1,23 @@
 import { DatePicker, Select } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   formatCurrencyVND,
   formatPrice,
   getStartAndEndOfMonth,
   getStartAndEndOfYear,
 } from "@/services/utils";
+import { useDispatch, useSelector } from "react-redux";
 
 import AuthRequest from "@/services/axios/AuthRequest";
 import { Line } from "@ant-design/plots";
 import ReactDOM from "react-dom";
+import { branchesSelector } from "@/services/redux/Slices/branches";
 import { handleChangeLoadingApp } from "@/services/redux/Slices/bootstrap";
-import { useDispatch } from "react-redux";
 
 const { RangePicker } = DatePicker;
 const RevenueStatistics = () => {
   const dispatch = useDispatch();
+  const { branches = [] } = useSelector(branchesSelector);
   const [data, setData] = useState([]);
   const [customDate, setCustomDate] = useState([]);
   const [option, setOptions] = useState("month");
@@ -29,6 +31,31 @@ const RevenueStatistics = () => {
       asyncFetch();
     }
   }, [customDate]);
+
+  const { expense, revenue, netProfit, quantity } = useMemo(() => {
+    return Array.isArray(data)
+      ? data?.reduce(
+          (acc, _) => {
+            if (_?.type == "Chi phí") acc.expense += _?.value;
+            if (_?.type == "Doanh thu") acc.revenue += _?.value;
+            if (_?.type == "Lợi nhuận ròng") acc.netProfit += _?.value;
+            if (_?.type == "Số lượng") acc.quantity += _?.value;
+            return acc;
+          },
+          {
+            expense: 0, // Chi phí
+            revenue: 0, // Doanh thu
+            netProfit: 0, // Lợi nhuận ròng
+            quantity: 0, // Số lượng
+          }
+        )
+      : {
+          expense: 0, // Chi phí
+          revenue: 0, // Doanh thu
+          netProfit: 0, // Lợi nhuận ròng
+          quantity: 0, // Số lượng
+        };
+  }, [data]);
 
   const asyncFetch = async () => {
     const queryOptions = {};
@@ -47,6 +74,9 @@ const RevenueStatistics = () => {
       const [a, b] = customDate;
       queryOptions.startDate = a;
       queryOptions.endDate = b;
+    }
+    if (Number(option)) {
+      queryOptions.branchID = Number(option);
     }
     await AuthRequest.get("orders/revenues", {
       params: queryOptions,
@@ -98,8 +128,20 @@ const RevenueStatistics = () => {
             />
           )}
           <Select
+            defaultValue={"all"}
+            className=" w-48"
+            onChange={setOptions}
+            options={[
+              { value: "all", label: "Tất cả cơ sở" },
+              ...branches.map((_) => ({
+                value: _?.id,
+                label: _.name,
+              })),
+            ]}
+          />
+          <Select
             defaultValue={option}
-            // style={{ width: 120 }}
+            className=" w-48"
             onChange={setOptions}
             options={[
               { value: "month", label: "Tháng hiện tại" },
@@ -116,6 +158,24 @@ const RevenueStatistics = () => {
         </h1>
       )}
       <Line {...config} />
+      <div className="flex justify-between font-dancing-script font-bold">
+        <div className="text-rose-500">
+          <h1>Tổng chi phí</h1>
+          <span className="font-roboto">{formatCurrencyVND(expense)}</span>
+        </div>
+        <div className="text-green-500">
+          <h1>Tổng doanh thu</h1>
+          <span className="font-roboto">{formatCurrencyVND(revenue)}</span>
+        </div>
+        <div className="text-blue-500">
+          <h1>Tổng lợi nhận ròng</h1>
+          <span className="font-roboto">{formatCurrencyVND(netProfit)}</span>
+        </div>
+        <div className="text-yellow-500">
+          <h1>Tổng số lượng</h1>
+          <span className="font-roboto">{quantity}</span>
+        </div>
+      </div>
     </div>
   );
 };

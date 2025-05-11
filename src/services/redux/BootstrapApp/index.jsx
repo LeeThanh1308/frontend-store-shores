@@ -25,7 +25,7 @@ import { handleGetSearch, searchSelector } from "../Slices/search";
 import { handleGetSliders, sliderSelector } from "../Slices/sliders";
 import { handleGetStores, storesSelector } from "../Slices/stores";
 import { handleGetTargets, targetsSelector } from "../Slices/targets";
-import { redirect, useParams, usePathname } from "next/navigation";
+import { redirect, useParams, usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
@@ -38,6 +38,7 @@ import { ordersSelector } from "../Slices/orders";
 function BootStrapApp() {
   const params = useParams();
   const pathname = usePathname();
+  const router = useRouter();
   const dispatch = useDispatch();
   const [showLoading, setShowLoading] = useState(false);
   const { onRefresh: onRefreshBootstrap, isLoading: isLoadingBootstrap } =
@@ -192,6 +193,11 @@ function BootStrapApp() {
         dispatch(handleGetInfoMyUser());
       }
     } else {
+      if (document.referrer) {
+        router.back();
+      } else {
+        router.replace("/");
+      }
       dispatch(handleClearCart());
     }
   }, [isAuthenticated, user]);

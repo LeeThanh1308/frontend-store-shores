@@ -18,17 +18,6 @@ function OrdersPage() {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
 
-  useEffect(() => {
-    AuthRequest.get("payment/orders")
-      .then((response) => response.data)
-      .then((data) => {
-        setDataHistory(data);
-      });
-  }, []);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -273,6 +262,18 @@ function OrdersPage() {
       />
     );
   };
+
+  useEffect(() => {
+    AuthRequest.get("payment/orders")
+      .then((response) => response.data)
+      .then((data) => {
+        setDataHistory(data);
+      });
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="w-full h-full pt-3">
