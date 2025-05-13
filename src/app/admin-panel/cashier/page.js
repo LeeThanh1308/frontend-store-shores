@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, Input, Select, Space, Table } from "antd";
-import { FaCartShopping, FaXmark } from "react-icons/fa6";
 import {
   cartsSelector,
   handleCreateCashiersCarts,
@@ -9,11 +8,7 @@ import {
   handleGetCashiersCarts,
   handleUpdateCart,
 } from "@/services/redux/Slices/carts";
-import {
-  formatCurrencyVND,
-  generateUrlImage,
-  handleConvertPrice,
-} from "@/services/utils";
+import { formatCurrencyVND, generateUrlImage } from "@/services/utils";
 import {
   handleFindProductByCashiers,
   productsSelector,
@@ -22,15 +17,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import AuthRequest from "@/services/axios/AuthRequest";
+import { FaXmark } from "react-icons/fa6";
 import Image from "next/image";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import InputQuantitySpinner from "@/components/ui/InputQuantitySpinner";
-import Link from "next/link";
-import Responsive from "@/components/layout/Responsive";
 import { SearchOutlined } from "@ant-design/icons";
 import Toastify from "@/components/sections/Toastify";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import { authSelector } from "@/services/redux/Slices/auth";
-import { useRequireAuth } from "@/components/auth/useAuthRedirect";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 
 const { Search } = Input;
 
@@ -579,4 +574,8 @@ function CashierPage() {
   );
 }
 
-export default CashierPage;
+export default withRoleGuard(CashierPage, [
+  allowedRoles.CEO,
+  allowedRoles.MANAGE,
+  allowedRoles.STAFF,
+]);

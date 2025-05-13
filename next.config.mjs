@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverMinification: false,
-  },
+  // experimental: {
+  //   serverMinification: false,
+  // },
+  productionBrowserSourceMaps: true,
   reactStrictMode: false,
   images: {
     remotePatterns: [

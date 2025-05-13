@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, ColorPicker, Input, Select, Space, Table } from "antd";
+import { Button, Input, Select, Space, Table } from "antd";
 import React, {
   useCallback,
   useEffect,
@@ -8,7 +8,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { formatCurrencyVND, handleRegexSlug } from "@/services/utils";
 import {
   handleGetAdminOrders,
   handlePushOrders,
@@ -22,6 +21,7 @@ import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 import Toastify from "@/components/sections/Toastify";
 import { allowedRoles } from "@/services/utils/allowedRoles";
+import { formatCurrencyVND } from "@/services/utils";
 import { initSocket } from "@/services/socket";
 import moment from "moment";
 import { withRoleGuard } from "@/components/auth/withRoleGuard";

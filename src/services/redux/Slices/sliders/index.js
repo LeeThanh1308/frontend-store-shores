@@ -3,7 +3,81 @@ import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
+export const handleGetSlider = createAsyncThunk(
+  "slider/handleGetSlider",
+  async ({ id, childrenId }) => {
+    const response = await GuestRequest.get("sliders", {
+      params: {
+        id: id,
+        parent: childrenId,
+      },
+    });
+    return { data: response.data };
+  }
+);
+export const handleGetSliders = createAsyncThunk(
+  "slider/handleGetSliders",
+  async () => {
+    const response = await GuestRequest.get("sliders");
+    return { data: response.data };
+  }
+);
+
+export const handleCreateSlider = createAsyncThunk(
+  "slider/handleCreateSlider",
+  async ({ name, slug, file, href }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("slug", slug);
+      formData.append("href", href);
+      if (file) formData.append("file", file);
+      const response = await GuestRequest.post("sliders", formData);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteSlider = createAsyncThunk(
+  "slider/handleDeleteSlider",
+  async ({ id, ids }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.delete("sliders", {
+        data: {
+          ids: ids,
+          id: id,
+        },
+      });
+      return { data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpdateSlider = createAsyncThunk(
+  "slider/handleUpdateSlider",
+  async ({ name, slug, file, href, id }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("id", id);
+      formData.append("slug", slug);
+      formData.append("href", href);
+      if (file) formData.append("file", file);
+      const response = await GuestRequest.patch(`sliders/${id}`, formData);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 const initialState = {
+  slider: {},
   sliders: [],
   isLoading: false,
   onRefresh: false,
@@ -88,80 +162,6 @@ const sliderSlice = createSlice({
     });
   },
 });
-
-export const handleGetSlider = createAsyncThunk(
-  "slider/handleGetSlider",
-  async ({ id, childrenId }) => {
-    const response = await GuestRequest.get("sliders", {
-      params: {
-        id: id,
-        parent: childrenId,
-      },
-    });
-    return { data: response.data };
-  }
-);
-export const handleGetSliders = createAsyncThunk(
-  "slider/handleGetSliders",
-  async () => {
-    const response = await GuestRequest.get("sliders");
-    return { data: response.data };
-  }
-);
-
-export const handleCreateSlider = createAsyncThunk(
-  "slider/handleCreateSlider",
-  async ({ name, slug, file, href }, { rejectWithValue }) => {
-    try {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("slug", slug);
-      formData.append("href", href);
-      if (file) formData.append("file", file);
-      const response = await GuestRequest.post("sliders", formData);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteSlider = createAsyncThunk(
-  "slider/handleDeleteSlider",
-  async ({ id, ids }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.delete("sliders", {
-        data: {
-          ids: ids,
-          id: id,
-        },
-      });
-      return { data: response.data };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpdateSlider = createAsyncThunk(
-  "slider/handleUpdateSlider",
-  async ({ name, slug, file, href, id }, { rejectWithValue }) => {
-    try {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("id", id);
-      formData.append("slug", slug);
-      formData.append("href", href);
-      if (file) formData.append("file", file);
-      const response = await GuestRequest.patch(`sliders/${id}`, formData);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const sliderSelector = (store) => store.sliders;
 export const sliderReducer = sliderSlice.reducer;

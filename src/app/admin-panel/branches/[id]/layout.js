@@ -12,7 +12,6 @@ import Link from "next/link";
 import { allowedRoles } from "@/services/utils/allowedRoles";
 import { authSelector } from "@/services/redux/Slices/auth";
 import { handleGetStores } from "@/services/redux/Slices/stores";
-import { withRoleGuard } from "@/components/auth/withRoleGuard";
 
 function PageLayout({ children }) {
   const params = useParams();

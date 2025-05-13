@@ -7,7 +7,7 @@ import {
   SearchOutlined,
   UnlockOutlined,
 } from "@ant-design/icons";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { generateUrlImage, removeEmptyObjectFields } from "@/services/utils";
 import {
   handleChangeBanAccounts,
@@ -23,7 +23,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import AuthRequest from "@/services/axios/AuthRequest";
-import { FaXmark } from "react-icons/fa6";
 import FallbackImage from "@/components/ui/FallbackImage";
 import FormPopup from "@/components/sections/FormPopup";
 import Highlighter from "react-highlight-words";

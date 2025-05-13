@@ -30,13 +30,12 @@ import { useDispatch, useSelector } from "react-redux";
 import AuthRequest from "@/services/axios/AuthRequest";
 import FallbackImage from "@/components/ui/FallbackImage";
 import FormPopup from "@/components/sections/FormPopup";
-import GuestRequest from "@/services/axios/GuestRequest";
 import Highlighter from "react-highlight-words";
-import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import Search from "antd/es/input/Search";
-import Toastify from "@/components/sections/Toastify";
+import { allowedRoles } from "@/services/utils/allowedRoles";
 import moment from "moment";
 import { useParams } from "next/navigation";
+import { withRoleGuard } from "@/components/auth/withRoleGuard";
 
 function EmployeesPage() {
   const params = useParams();
@@ -524,4 +523,8 @@ function EmployeesPage() {
   );
 }
 
-export default EmployeesPage;
+export default withRoleGuard(EmployeesPage, [
+  allowedRoles.CEO,
+  allowedRoles.MANAGE,
+  allowedRoles.STAFF,
+]);

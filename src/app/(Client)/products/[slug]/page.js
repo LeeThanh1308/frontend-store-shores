@@ -258,6 +258,7 @@ function DetailProductPage() {
                       ) {
                         Toastify(1, "Sản phẩm đã được bán hết.");
                       }
+
                       requireLogin(() => {
                         if (
                           +product?.colors?.[activeColor]?.id &&

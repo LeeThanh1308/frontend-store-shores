@@ -1,8 +1,58 @@
-import Toastify from "@/components/sections/Toastify";
 import GuestRequest from "@/services/axios/GuestRequest";
+import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
+export const handleGetTargets = createAsyncThunk(
+  "targets/handleGetTargets",
+  async () => {
+    const response = await GuestRequest.get("target-groups");
+    return { data: response.data };
+  }
+);
+
+export const handleCreateTarget = createAsyncThunk(
+  "targets/handleCreateTarget",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.post("target-groups", data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteTarget = createAsyncThunk(
+  "targets/handleDeleteTarget",
+  async ({ id, ids }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.delete("target-groups", {
+        data: {
+          ids: ids,
+          id: id,
+        },
+      });
+      return { data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpdateTarget = createAsyncThunk(
+  "targets/handleUpdateTarget",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.patch(`target-groups/${id}`, data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 const initialState = {
   targets: [],
   isLoading: false,
@@ -69,57 +119,6 @@ const targetsSlice = createSlice({
     });
   },
 });
-
-export const handleGetTargets = createAsyncThunk(
-  "targets/handleGetTargets",
-  async () => {
-    const response = await GuestRequest.get("target-groups");
-    return { data: response.data };
-  }
-);
-
-export const handleCreateTarget = createAsyncThunk(
-  "targets/handleCreateTarget",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.post("target-groups", data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteTarget = createAsyncThunk(
-  "targets/handleDeleteTarget",
-  async ({ id, ids }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.delete("target-groups", {
-        data: {
-          ids: ids,
-          id: id,
-        },
-      });
-      return { data: response.data };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpdateTarget = createAsyncThunk(
-  "targets/handleUpdateTarget",
-  async ({ id, ...data }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.patch(`target-groups/${id}`, data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const targetsSelector = (store) => store.targets;
 export const targetsReducer = targetsSlice.reducer;

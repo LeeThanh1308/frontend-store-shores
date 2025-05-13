@@ -4,6 +4,58 @@ import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
+export const handleGetStores = createAsyncThunk(
+  "stores/handleGetStores",
+  async (data) => {
+    const response = await GuestRequest.get("stores", {
+      params: data,
+    });
+    return { data: response.data };
+  }
+);
+
+export const handleCreateStore = createAsyncThunk(
+  "stores/handleCreateStore",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.post("stores", data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteStore = createAsyncThunk(
+  "stores/handleDeleteStore",
+  async ({ id, ids }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.delete("stores", {
+        data: {
+          ids: ids,
+          id: id,
+        },
+      });
+      return { data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpdateStore = createAsyncThunk(
+  "stores/handleUpdateStore",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.patch(`stores/${id}`, data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 const initialState = {
   stores: [],
   isLoading: false,
@@ -71,59 +123,6 @@ const storesSlice = createSlice({
     });
   },
 });
-
-export const handleGetStores = createAsyncThunk(
-  "stores/handleGetStores",
-  async (data) => {
-    const response = await GuestRequest.get("stores", {
-      params: data,
-    });
-    return { data: response.data };
-  }
-);
-
-export const handleCreateStore = createAsyncThunk(
-  "stores/handleCreateStore",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.post("stores", data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteStore = createAsyncThunk(
-  "stores/handleDeleteStore",
-  async ({ id, ids }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.delete("stores", {
-        data: {
-          ids: ids,
-          id: id,
-        },
-      });
-      return { data: response.data };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpdateStore = createAsyncThunk(
-  "stores/handleUpdateStore",
-  async ({ id, ...data }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.patch(`stores/${id}`, data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const storesSelector = (store) => store.stores;
 export const storesReducer = storesSlice.reducer;

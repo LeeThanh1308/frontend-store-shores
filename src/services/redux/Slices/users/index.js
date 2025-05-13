@@ -1,9 +1,52 @@
 import AuthRequest from "@/services/axios/AuthRequest";
-import GuestRequest from "@/services/axios/GuestRequest";
-import Toastify from "@/components/sections/Toastify";
+
+// import GuestRequest from "@/services/axios/GuestRequest";
+// import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
+export const handleGetListAccountCustomers = createAsyncThunk(
+  "users/handleGetListAccountCustomers",
+  async () => {
+    const response = await AuthRequest.get("accounts/users");
+    return response.data;
+  }
+);
 
+export const handleCreateAccountByAdmin = createAsyncThunk(
+  "users/handleCreateAccountByAdmin",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.post("accounts", data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleChangeBanAccounts = createAsyncThunk(
+  "users/handleChangeBanAccounts",
+  async ({ id, ...body }, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.patch("accounts/ban/" + id, body);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpdateInfoCustomers = createAsyncThunk(
+  "users/handleUpdateInfoCustomers",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.patch("accounts/edit", data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 const initialState = {
   users: {
     data: [],
@@ -74,50 +117,6 @@ const usersSlice = createSlice({
     //#################################################################
   },
 });
-
-export const handleGetListAccountCustomers = createAsyncThunk(
-  "users/handleGetListAccountCustomers",
-  async () => {
-    const response = await AuthRequest.get("accounts/users");
-    return response.data;
-  }
-);
-
-export const handleCreateAccountByAdmin = createAsyncThunk(
-  "users/handleCreateAccountByAdmin",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.post("accounts", data);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleChangeBanAccounts = createAsyncThunk(
-  "users/handleChangeBanAccounts",
-  async ({ id, ...body }, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.patch("accounts/ban/" + id, body);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpdateInfoCustomers = createAsyncThunk(
-  "users/handleUpdateInfoCustomers",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.patch("accounts/edit", data);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const usersSelector = (store) => store.users;
 export const usersReducer = usersSlice.reducer;

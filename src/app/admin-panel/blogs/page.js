@@ -19,7 +19,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import FormPopup from "@/components/sections/FormPopup";
 import Highlighter from "react-highlight-words";
-import Image from "next/image";
 import InputFormAdmin from "@/components/ui/InputFormAdmin";
 import RichTextEditor from "@/components/sections/RichTextEditor";
 import { SearchOutlined } from "@ant-design/icons";
@@ -65,6 +64,10 @@ function BlogPage() {
     }, 200);
     return () => clearTimeout(timerID);
   }, [blogs?.length]);
+
+  useEffect(() => {
+    if (onRefresh) dispatch(handleGetBlogs());
+  }, [onRefresh]);
 
   useEffect(() => {
     Object.entries(validators).forEach(([field, message]) => {

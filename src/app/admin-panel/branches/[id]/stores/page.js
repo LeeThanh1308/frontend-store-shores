@@ -666,4 +666,8 @@ function Stores() {
   );
 }
 
-export default Stores;
+export default withRoleGuard(Stores, [
+  allowedRoles.CEO,
+  allowedRoles.MANAGE,
+  allowedRoles.STAFF,
+]);

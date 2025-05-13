@@ -16,7 +16,7 @@ function ProductSection({ title = "", data = [] }) {
           <div className="h-0.5 flex-[0.3] bg-rose-700"></div>
         </div>
 
-        <div className=" grid grid-cols-5 gap-3">
+        <div className=" grid lt:grid-cols-5 mb:grid-cols-1 gap-3">
           {data?.map((_, index) => {
             return <ProductItem data={_} key={index} />;
           })}

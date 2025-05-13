@@ -83,7 +83,7 @@ function Header() {
             </Link>
           </div>
 
-          <div>
+          <div className=" mb:hidden tl:block">
             <ul className=" list-none flex-center flex-wrap gap-8 font-bold text-lg font-dancing-script text-rose-700">
               <li className=" hover:underline cursor-pointer relative group">
                 <h1>Giày</h1>
@@ -278,7 +278,7 @@ function Header() {
                           href={
                             role == "CEO"
                               ? "/admin-panel/dashboard"
-                              : "/admin-panel"
+                              : "/admin-panel/cashier"
                           }
                         >
                           <div className="w-full h-12 pl-4 flex items-center hover:bg-black rounded-md hover:text-white cursor-pointer hover:font-bold border mb-1 text-shadow">
@@ -291,7 +291,12 @@ function Header() {
                           Đơn hàng của bạn
                         </div>
                       </Link>
-                      <Link href="/cart">
+                      <Link href="/posts">
+                        <div className="w-full h-12 pl-4 flex items-center hover:bg-black rounded-md hover:text-white cursor-pointer hover:font-bold border mb-1 text-shadow">
+                          Bài viết của tôi
+                        </div>
+                      </Link>
+                      <Link href="/carts">
                         <div className="w-full h-12 pl-4 flex items-center hover:bg-black rounded-md hover:text-white cursor-pointer hover:font-bold border mb-1 text-shadow">
                           Giỏ hàng
                         </div>

@@ -1,7 +1,87 @@
-import Toastify from "@/components/sections/Toastify";
 import GuestRequest from "@/services/axios/GuestRequest";
+import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
+
+export const handleGetCategory = createAsyncThunk(
+  "category/handleGetCategory",
+  async ({ id, childrenId }) => {
+    const response = await GuestRequest.get("categories", {
+      params: {
+        id: id,
+        parent: childrenId,
+      },
+    });
+    return { data: response.data };
+  }
+);
+export const handleGetCategories = createAsyncThunk(
+  "category/handleGetCategories",
+  async () => {
+    const response = await GuestRequest.get("categories");
+    return { data: response.data };
+  }
+);
+
+export const handleCreateCategory = createAsyncThunk(
+  "category/handleCreateCategory",
+  async ({ name, slug, icon, file, parentId }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("slug", slug);
+      if (file && file[0]) formData.append("file", file[0]);
+      if (parentId) formData.append("parentId", parentId);
+      const response = await GuestRequest.post("categories", formData);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteCategory = createAsyncThunk(
+  "category/handleDeleteCategory",
+  async ({ id, ids }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.delete("categories", {
+        data: {
+          ids: ids,
+          id: id,
+        },
+      });
+      return { data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpadateCategory = createAsyncThunk(
+  "category/handleUpadateCategory",
+  async (
+    { id, name, slug, parentId, icon, file, isActive },
+    { rejectWithValue }
+  ) => {
+    try {
+      console.log(file);
+      const formData = new FormData();
+      if (id) formData.append("id", id);
+      if (name) formData.append("name", name);
+      if (slug) formData.append("slug", slug);
+      formData.append("isActive", JSON.stringify(isActive));
+      if (parentId) formData.append("parentId", parentId);
+      if (file && typeof file !== "string" && file[0] instanceof File)
+        formData.append("file", file[0]);
+      const response = await GuestRequest.patch(`categories/${id}`, formData);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 
 const initialState = {
   categorys: {
@@ -92,86 +172,6 @@ const categorySlice = createSlice({
     });
   },
 });
-
-export const handleGetCategory = createAsyncThunk(
-  "category/handleGetCategory",
-  async ({ id, childrenId }) => {
-    const response = await GuestRequest.get("categories", {
-      params: {
-        id: id,
-        parent: childrenId,
-      },
-    });
-    return { data: response.data };
-  }
-);
-export const handleGetCategories = createAsyncThunk(
-  "category/handleGetCategories",
-  async () => {
-    const response = await GuestRequest.get("categories");
-    return { data: response.data };
-  }
-);
-
-export const handleCreateCategory = createAsyncThunk(
-  "category/handleCreateCategory",
-  async ({ name, slug, icon, file, parentId }, { rejectWithValue }) => {
-    try {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("slug", slug);
-      if (file && file[0]) formData.append("file", file[0]);
-      if (parentId) formData.append("parentId", parentId);
-      const response = await GuestRequest.post("categories", formData);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteCategory = createAsyncThunk(
-  "category/handleDeleteCategory",
-  async ({ id, ids }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.delete("categories", {
-        data: {
-          ids: ids,
-          id: id,
-        },
-      });
-      return { data: response.data };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpadateCategory = createAsyncThunk(
-  "category/handleUpadateCategory",
-  async (
-    { id, name, slug, parentId, icon, file, isActive },
-    { rejectWithValue }
-  ) => {
-    try {
-      console.log(file);
-      const formData = new FormData();
-      if (id) formData.append("id", id);
-      if (name) formData.append("name", name);
-      if (slug) formData.append("slug", slug);
-      formData.append("isActive", JSON.stringify(isActive));
-      if (parentId) formData.append("parentId", parentId);
-      if (file && typeof file !== "string" && file[0] instanceof File)
-        formData.append("file", file[0]);
-      const response = await GuestRequest.patch(`categories/${id}`, formData);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const categorySelector = (store) => store.category;
 export const categoryReducer = categorySlice.reducer;

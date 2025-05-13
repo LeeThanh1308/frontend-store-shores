@@ -3,7 +3,7 @@ import Responsive from "./Responsive";
 
 function Footer() {
   return (
-    <div className=" bg-black text-white">
+    <div className=" bg-black text-white pb-24">
       <Responsive>
         <div className="w-full py-4 flex justify-between text-xs text-justify">
           <div className="sm:w-1/2 w-1/4 mr-8">
@@ -14,7 +14,7 @@ function Footer() {
               src={"/images/logo.png"}
             />
             <div className="mb-2">
-              Công Ty Cổ Phần Dịch Vụ Thương Mại Tổng Hợp WinCommerce
+              Công Ty Cổ Phần Dịch Vụ Thương Mại Tổng Hợp
             </div>
             <div>
               Mã số doanh nghiệp: 0104918404 Đăng ký lần đầu ngày 20 tháng 09
@@ -24,7 +24,7 @@ function Footer() {
           <div className="sm:w-1/2 w-1/4 mr-8">
             <div className="mb-3 text-white/70">Về chúng tôi</div>
             <div className="mb-2 hover:text-red-500 cursor-pointer">
-              Giới thiệu về VinMart
+              Giới thiệu về Phoenix
             </div>
             <div className="mb-2 hover:text-red-500 cursor-pointer">
               Danh sách cửa hàng

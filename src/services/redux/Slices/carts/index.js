@@ -4,6 +4,75 @@ import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
+export const handleGetCarts = createAsyncThunk(
+  "carts/handleGetCarts",
+  async () => {
+    const response = await AuthRequest.get("carts/me");
+    return { data: response.data };
+  }
+);
+
+export const handleCreateCart = createAsyncThunk(
+  "carts/handleCreateCart",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.post("carts", data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetCashiersCarts = createAsyncThunk(
+  "carts/handleGetCashiersCarts",
+  async () => {
+    const response = await AuthRequest.get("carts/cashiers");
+    return { data: response.data };
+  }
+);
+
+export const handleCreateCashiersCarts = createAsyncThunk(
+  "carts/handleCreateCashiersCarts",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.post("carts/cashiers", data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteCart = createAsyncThunk(
+  "carts/handleDeleteCart",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.delete("carts", {
+        data,
+      });
+      return { data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpdateCart = createAsyncThunk(
+  "carts/handleUpdateCart",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.patch(`carts/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
 const initialState = {
   carts: [],
   cashiersCarts: [],
@@ -98,75 +167,6 @@ const cartsSlice = createSlice({
     });
   },
 });
-
-export const handleGetCarts = createAsyncThunk(
-  "carts/handleGetCarts",
-  async () => {
-    const response = await AuthRequest.get("carts/me");
-    return { data: response.data };
-  }
-);
-
-export const handleCreateCart = createAsyncThunk(
-  "carts/handleCreateCart",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.post("carts", data);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleGetCashiersCarts = createAsyncThunk(
-  "carts/handleGetCashiersCarts",
-  async () => {
-    const response = await AuthRequest.get("carts/cashiers");
-    return { data: response.data };
-  }
-);
-
-export const handleCreateCashiersCarts = createAsyncThunk(
-  "carts/handleCreateCashiersCarts",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.post("carts/cashiers", data);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteCart = createAsyncThunk(
-  "carts/handleDeleteCart",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.delete("carts", {
-        data,
-      });
-      return { data: response.data };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpdateCart = createAsyncThunk(
-  "carts/handleUpdateCart",
-  async ({ id, ...data }, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.patch(`carts/${id}`, data);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const { handleClearCart } = cartsSlice.actions;
 export const cartsSelector = (store) => store.carts;

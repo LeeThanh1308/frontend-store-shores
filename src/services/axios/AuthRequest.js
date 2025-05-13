@@ -1,9 +1,9 @@
 import Cookies from "js-cookie";
-import Toastify from "@/components/sections/Toastify";
 import axios from "axios";
-import { handleClearCart } from "../redux/Slices/carts";
-import { handleLogoutState } from "../redux/Slices/auth";
-import store from "../redux/store";
+
+// import { handleClearCart } from "../redux/Slices/carts";
+// import { handleLogoutState } from "../redux/Slices/auth";
+// import store from "../redux/store";
 
 const AuthRequest = axios.create({
   baseURL: process.env.NEXT_PUBLIC_DOMAIN_API,
@@ -32,9 +32,8 @@ const refreshToken = (config) => {
       })
       .catch((e) => {
         if (e?.response?.status === 403) {
-          Toastify(0, "Phiên đăng nhập đã hết hạn vui lòng đăng nhập lại.");
-          store.dispatch(handleLogoutState());
-          store.dispatch(handleClearCart());
+          // store.dispatch(handleLogoutState());
+          // store.dispatch(handleClearCart());
         }
         reject(config);
       });

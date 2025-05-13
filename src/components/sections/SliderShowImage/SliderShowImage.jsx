@@ -6,16 +6,13 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./stylesSliderShowImage.css";
 
-import {
-  Autoplay,
-  EffectCoverflow,
-  EffectFade,
-  Pagination,
-} from "swiper/modules";
-import React, { memo, useRef, useState } from "react";
+import { Autoplay, EffectCoverflow, Pagination } from "swiper/modules";
+import React, { memo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import Image from "next/image";
+import Link from "next/link";
+import { generateUrlImage } from "@/services/utils";
 
 function SliderShowImage({ data, onActiveImage = (index) => {}, ...props }) {
   return (
@@ -44,7 +41,23 @@ function SliderShowImage({ data, onActiveImage = (index) => {}, ...props }) {
       {data.map((_, i) => {
         return (
           <SwiperSlide key={i}>
-            <Image src={_} alt="slider show" objectFit="cover" layout="fill" />
+            {_?.href ? (
+              <Link href={_?.href ?? "/"}>
+                <Image
+                  src={`${generateUrlImage(_?.src)}`}
+                  alt="slider show"
+                  objectFit="cover"
+                  layout="fill"
+                />
+              </Link>
+            ) : (
+              <Image
+                src={`${generateUrlImage(_?.src)}`}
+                alt="slider show"
+                objectFit="cover"
+                layout="fill"
+              />
+            )}
           </SwiperSlide>
         );
       })}

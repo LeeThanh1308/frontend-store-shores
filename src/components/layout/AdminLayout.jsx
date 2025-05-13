@@ -23,12 +23,17 @@ const initMenuItems = [
   },
   {
     name: "Trang thu ngân",
-    path: "/",
+    path: "cashier",
     roles: [allowedRoles.CEO, allowedRoles.MANAGE, allowedRoles.STAFF],
   },
   {
     name: "Quản trị tài khoản",
     path: "users",
+    roles: [allowedRoles.CEO],
+  },
+  {
+    name: "Quản trị silders",
+    path: "sliders",
     roles: [allowedRoles.CEO],
   },
   {

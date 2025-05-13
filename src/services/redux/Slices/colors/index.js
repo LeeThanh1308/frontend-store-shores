@@ -1,7 +1,58 @@
-import Toastify from "@/components/sections/Toastify";
 import GuestRequest from "@/services/axios/GuestRequest";
+import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
+
+export const handleGetColors = createAsyncThunk(
+  "colors/handleGetColors",
+  async () => {
+    const response = await GuestRequest.get("product-colors");
+    return { data: response.data };
+  }
+);
+
+export const handleCreateColor = createAsyncThunk(
+  "colors/handleCreateColor",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.post("product-colors", data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteColor = createAsyncThunk(
+  "colors/handleDeleteColor",
+  async ({ id, ids }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.delete("product-colors", {
+        data: {
+          ids: ids,
+          id: id,
+        },
+      });
+      return { data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpdateColor = createAsyncThunk(
+  "colors/handleUpdateColor",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.patch(`product-colors/${id}`, data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 
 const initialState = {
   colors: [],
@@ -70,57 +121,6 @@ const colorsSlice = createSlice({
     });
   },
 });
-
-export const handleGetColors = createAsyncThunk(
-  "colors/handleGetColors",
-  async () => {
-    const response = await GuestRequest.get("product-colors");
-    return { data: response.data };
-  }
-);
-
-export const handleCreateColor = createAsyncThunk(
-  "colors/handleCreateColor",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.post("product-colors", data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteColor = createAsyncThunk(
-  "colors/handleDeleteColor",
-  async ({ id, ids }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.delete("product-colors", {
-        data: {
-          ids: ids,
-          id: id,
-        },
-      });
-      return { data: response.data };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpdateColor = createAsyncThunk(
-  "colors/handleUpdateColor",
-  async ({ id, ...data }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.patch(`product-colors/${id}`, data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const colorsSelector = (store) => store.colors;
 export const colorsReducer = colorsSlice.reducer;

@@ -37,7 +37,6 @@ import { ordersSelector } from "../Slices/orders";
 
 function BootStrapApp() {
   const params = useParams();
-  const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch();
   const [showLoading, setShowLoading] = useState(false);
@@ -89,7 +88,6 @@ function BootStrapApp() {
       if (onRefreshProducts) dispatch(handleGetProducts());
       if (onRefreshStores) dispatch(handleGetStores({ branchID: params?.id }));
       if (onRefreshSliders) dispatch(handleGetSliders());
-      if (onRefreshBlogs) dispatch(handleGetBlogs());
       if (isAuthenticated) {
         if (onRefreshCart) dispatch(handleGetCarts());
         if (onRefreshUsers) dispatch(handleGetListAccountCustomers());

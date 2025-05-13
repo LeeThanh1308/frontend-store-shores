@@ -3,6 +3,70 @@ import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
+export const handleGetSizes = createAsyncThunk(
+  "sizes/handleGetSizes",
+  async () => {
+    const response = await GuestRequest.get("product-sizes");
+    return { data: response.data };
+  }
+);
+
+export const handleCreateSize = createAsyncThunk(
+  "sizes/handleCreateSize",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.post("product-sizes", data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteSize = createAsyncThunk(
+  "sizes/handleDeleteSize",
+  async ({ id, ids }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.delete("product-sizes", {
+        data: {
+          ids: ids,
+          id: id,
+        },
+      });
+      return { data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpdateSize = createAsyncThunk(
+  "sizes/handleUpdateSize",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.patch(`product-sizes/${id}`, data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetSizeWhereProductID = createAsyncThunk(
+  "sizes/handleGetSizeWhereProductID",
+  async ({ id, ...query }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.get(`product-sizes/products/${id}`, {
+        params: query,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 const initialState = {
   sizes: [],
   sizesWhere: [],
@@ -80,71 +144,6 @@ const sizesSlice = createSlice({
     });
   },
 });
-
-export const handleGetSizes = createAsyncThunk(
-  "sizes/handleGetSizes",
-  async () => {
-    const response = await GuestRequest.get("product-sizes");
-    return { data: response.data };
-  }
-);
-
-export const handleCreateSize = createAsyncThunk(
-  "sizes/handleCreateSize",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.post("product-sizes", data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteSize = createAsyncThunk(
-  "sizes/handleDeleteSize",
-  async ({ id, ids }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.delete("product-sizes", {
-        data: {
-          ids: ids,
-          id: id,
-        },
-      });
-      return { data: response.data };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpdateSize = createAsyncThunk(
-  "sizes/handleUpdateSize",
-  async ({ id, ...data }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.patch(`product-sizes/${id}`, data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleGetSizeWhereProductID = createAsyncThunk(
-  "sizes/handleGetSizeWhereProductID",
-  async ({ id, ...query }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.get(`product-sizes/products/${id}`, {
-        params: query,
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const sizesSelector = (store) => store.sizes;
 export const sizesReducer = sizesSlice.reducer;

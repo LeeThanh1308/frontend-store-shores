@@ -1,11 +1,11 @@
 "use client";
 
-import { FaCreditCard, FaMoneyBill } from "react-icons/fa";
-import { useContext, useEffect, useState } from "react";
+// import { FaCreditCard, FaMoneyBill } from "react-icons/fa";
+
+import { useEffect, useState } from "react";
 
 import AuthRequest from "@/services/axios/AuthRequest";
 import { Button } from "antd";
-import Cookies from "js-cookie";
 import IsArray from "@/components/ui/IsArray";
 import Responsive from "@/components/layout/Responsive";
 import Toastify from "@/components/sections/Toastify";
@@ -14,7 +14,6 @@ import { authSelector } from "@/services/redux/Slices/auth";
 import axios from "axios";
 import { cartsSelector } from "@/services/redux/Slices/carts";
 import { formatCurrencyVND } from "@/services/utils";
-import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 

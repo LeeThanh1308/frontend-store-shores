@@ -5,7 +5,7 @@ import {
   handleChangeStateActiveVerify,
 } from "@/services/redux/Slices/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import { FaCircleCheck } from "react-icons/fa6";
 import { handleGetInfoVerifyCodeSign } from "@/services/redux/Slices/auth/registerApi";

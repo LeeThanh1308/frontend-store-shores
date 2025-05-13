@@ -3,106 +3,6 @@ import GuestRequest from "@/services/axios/GuestRequest";
 import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
-
-const initialState = {
-  product: {},
-  products: [],
-  search: [],
-  isLoading: false,
-  onRefresh: false,
-  validators: {},
-};
-
-const productsSlice = createSlice({
-  name: "products",
-  initialState,
-  reducers: {
-    handleChangeLoading(state, action) {
-      state.isLoading = action.payload;
-    },
-  },
-  extraReducers: (builder) => {
-    //#################################################################
-    builder.addCase(handleGetProducts.pending, (state, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(handleGetProducts.rejected, (state, action) => {
-      state.isLoading = false;
-    });
-    builder.addCase(handleGetProducts.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.onRefresh = false;
-      state.products = Array.isArray(action.payload?.data)
-        ? action.payload?.data
-        : [];
-    });
-    //#################################################################
-    builder.addCase(handleGetProduct.pending, (state, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(handleGetProduct.rejected, (state, action) => {
-      state.isLoading = false;
-    });
-    builder.addCase(handleGetProduct.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.onRefresh = false;
-      state.product = action.payload ?? {};
-    });
-    //#################################################################
-    builder.addCase(handleFindProductByCashiers.pending, (state, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(handleFindProductByCashiers.rejected, (state, action) => {
-      state.isLoading = false;
-    });
-    builder.addCase(handleFindProductByCashiers.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.onRefresh = false;
-      state.search = action.payload;
-    });
-    //#################################################################
-    builder.addCase(handleCreateProduct.pending, (state, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(handleCreateProduct.rejected, (state, action) => {
-      state.validators = action.payload?.validators ?? {};
-      state.isLoading = false;
-    });
-    builder.addCase(handleCreateProduct.fulfilled, (state, action) => {
-      Toastify(1, action.payload?.message);
-      state.isLoading = false;
-      state.onRefresh = true;
-    });
-    //#################################################################
-    builder.addCase(handleUpdateProduct.pending, (state, action) => {
-      console.log("pending");
-      state.isLoading = true;
-    });
-    builder.addCase(handleUpdateProduct.rejected, (state, action) => {
-      console.log("faler");
-      state.validators = action.payload?.validators ?? {};
-      state.isLoading = false;
-    });
-    builder.addCase(handleUpdateProduct.fulfilled, (state, action) => {
-      Toastify(action.payload?.data?.type, action.payload?.data?.message);
-      state.isLoading = false;
-      state.onRefresh = true;
-    });
-    //#################################################################
-    builder.addCase(handleDeleteProduct.pending, (state, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(handleDeleteProduct.rejected, (state, action) => {
-      state.isLoading = false;
-    });
-    builder.addCase(handleDeleteProduct.fulfilled, (state, action) => {
-      Toastify(action.payload?.data?.type, action.payload?.data?.message);
-      state.isLoading = false;
-      state.onRefresh = true;
-    });
-  },
-});
-
 export const handleGetProducts = createAsyncThunk(
   "products/handleGetProducts",
   async () => {
@@ -227,6 +127,104 @@ export const handleFindProductByCashiers = createAsyncThunk(
     }
   }
 );
+const initialState = {
+  product: {},
+  products: [],
+  search: [],
+  isLoading: false,
+  onRefresh: false,
+  validators: {},
+};
+
+const productsSlice = createSlice({
+  name: "products",
+  initialState,
+  reducers: {
+    handleChangeLoading(state, action) {
+      state.isLoading = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    //#################################################################
+    builder.addCase(handleGetProducts.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleGetProducts.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleGetProducts.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+      state.products = Array.isArray(action.payload?.data)
+        ? action.payload?.data
+        : [];
+    });
+    //#################################################################
+    builder.addCase(handleGetProduct.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleGetProduct.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleGetProduct.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+      state.product = action.payload ?? {};
+    });
+    //#################################################################
+    builder.addCase(handleFindProductByCashiers.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleFindProductByCashiers.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleFindProductByCashiers.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+      state.search = action.payload;
+    });
+    //#################################################################
+    builder.addCase(handleCreateProduct.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleCreateProduct.rejected, (state, action) => {
+      state.validators = action.payload?.validators ?? {};
+      state.isLoading = false;
+    });
+    builder.addCase(handleCreateProduct.fulfilled, (state, action) => {
+      Toastify(1, action.payload?.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+    //#################################################################
+    builder.addCase(handleUpdateProduct.pending, (state, action) => {
+      console.log("pending");
+      state.isLoading = true;
+    });
+    builder.addCase(handleUpdateProduct.rejected, (state, action) => {
+      console.log("faler");
+      state.validators = action.payload?.validators ?? {};
+      state.isLoading = false;
+    });
+    builder.addCase(handleUpdateProduct.fulfilled, (state, action) => {
+      Toastify(action.payload?.data?.type, action.payload?.data?.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+    //#################################################################
+    builder.addCase(handleDeleteProduct.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleDeleteProduct.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleDeleteProduct.fulfilled, (state, action) => {
+      Toastify(action.payload?.data?.type, action.payload?.data?.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+  },
+});
 
 export const productsSelector = (store) => store.products;
 export const productsReducer = productsSlice.reducer;

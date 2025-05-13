@@ -1,6 +1,5 @@
 "use client";
 
-import { FaCartShopping, FaXmark } from "react-icons/fa6";
 import {
   cartsSelector,
   handleDeleteCart,
@@ -14,6 +13,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo, useState } from "react";
 
+import { FaXmark } from "react-icons/fa6";
 import Image from "next/image";
 import InputQuantitySpinner from "@/components/ui/InputQuantitySpinner";
 import Link from "next/link";

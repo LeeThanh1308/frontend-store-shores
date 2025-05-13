@@ -1,75 +1,7 @@
-import Toastify from "@/components/sections/Toastify";
 import GuestRequest from "@/services/axios/GuestRequest";
+import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
-
-const initialState = {
-  brands: [],
-  isLoading: false,
-  onRefresh: false,
-  validators: {},
-};
-
-const brandsSlice = createSlice({
-  name: "brands",
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    //#################################################################
-    builder.addCase(handleGetBrands.pending, (state, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(handleGetBrands.rejected, (state, action) => {
-      state.isLoading = false;
-    });
-    builder.addCase(handleGetBrands.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.onRefresh = false;
-      state.brands = action.payload?.data;
-    });
-    //#################################################################
-    builder.addCase(handleCreateBrand.pending, (state, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(handleCreateBrand.rejected, (state, action) => {
-      state.validators = action.payload?.validators ?? {};
-      state.isLoading = false;
-    });
-    builder.addCase(handleCreateBrand.fulfilled, (state, action) => {
-      Toastify(1, action.payload?.message);
-      state.isLoading = false;
-      state.onRefresh = true;
-    });
-    //#################################################################
-    builder.addCase(handleUpdateBrand.pending, (state, action) => {
-      console.log("pending");
-      state.isLoading = true;
-    });
-    builder.addCase(handleUpdateBrand.rejected, (state, action) => {
-      console.log("faler");
-      state.validators = action.payload?.validators ?? {};
-      state.isLoading = false;
-    });
-    builder.addCase(handleUpdateBrand.fulfilled, (state, action) => {
-      console.log("success");
-      Toastify(action.payload?.data?.type, action.payload?.data?.message);
-      state.isLoading = false;
-      state.onRefresh = true;
-    });
-    //#################################################################
-    builder.addCase(handleDeleteBrand.pending, (state, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(handleDeleteBrand.rejected, (state, action) => {
-      state.isLoading = false;
-    });
-    builder.addCase(handleDeleteBrand.fulfilled, (state, action) => {
-      Toastify(action.payload?.data?.type, action.payload?.data?.message);
-      state.isLoading = false;
-      state.onRefresh = true;
-    });
-  },
-});
 
 export const handleGetBrands = createAsyncThunk(
   "brands/handleGetBrands",
@@ -139,6 +71,74 @@ export const handleUpdateBrand = createAsyncThunk(
     }
   }
 );
+
+const initialState = {
+  brands: [],
+  isLoading: false,
+  onRefresh: false,
+  validators: {},
+};
+
+const brandsSlice = createSlice({
+  name: "brands",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    //#################################################################
+    builder.addCase(handleGetBrands.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleGetBrands.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleGetBrands.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.onRefresh = false;
+      state.brands = action.payload?.data;
+    });
+    //#################################################################
+    builder.addCase(handleCreateBrand.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleCreateBrand.rejected, (state, action) => {
+      state.validators = action.payload?.validators ?? {};
+      state.isLoading = false;
+    });
+    builder.addCase(handleCreateBrand.fulfilled, (state, action) => {
+      Toastify(1, action.payload?.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+    //#################################################################
+    builder.addCase(handleUpdateBrand.pending, (state, action) => {
+      console.log("pending");
+      state.isLoading = true;
+    });
+    builder.addCase(handleUpdateBrand.rejected, (state, action) => {
+      console.log("faler");
+      state.validators = action.payload?.validators ?? {};
+      state.isLoading = false;
+    });
+    builder.addCase(handleUpdateBrand.fulfilled, (state, action) => {
+      console.log("success");
+      Toastify(action.payload?.data?.type, action.payload?.data?.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+    //#################################################################
+    builder.addCase(handleDeleteBrand.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(handleDeleteBrand.rejected, (state, action) => {
+      state.isLoading = false;
+    });
+    builder.addCase(handleDeleteBrand.fulfilled, (state, action) => {
+      Toastify(action.payload?.data?.type, action.payload?.data?.message);
+      state.isLoading = false;
+      state.onRefresh = true;
+    });
+  },
+});
 
 export const brandsSelector = (store) => store.brands;
 export const brandsReducer = brandsSlice.reducer;

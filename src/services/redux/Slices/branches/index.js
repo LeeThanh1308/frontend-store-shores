@@ -4,6 +4,117 @@ import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
+export const handleGetBranches = createAsyncThunk(
+  "branches/handleGetBranches",
+  async () => {
+    const response = await GuestRequest.get("branches");
+    return { data: response.data };
+  }
+);
+
+export const handleGetThisBranches = createAsyncThunk(
+  "branches/handleGetThisBranches",
+  async () => {
+    const response = await AuthRequest.get("branches/this-branches");
+    return response.data;
+  }
+);
+
+export const handleGetBranch = createAsyncThunk(
+  "branches/handleGetBranch",
+  async (id) => {
+    const response = await GuestRequest.get("branches", {
+      params: {
+        id: id,
+      },
+    });
+    return { data: response.data };
+  }
+);
+
+export const handleCreateBranch = createAsyncThunk(
+  "branches/handleCreateBranch",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.post("branches", data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteBranch = createAsyncThunk(
+  "branches/handleDeleteBranch",
+  async ({ id, ids }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.delete("branches", {
+        data: {
+          ids: ids,
+          id: id,
+        },
+      });
+      return { data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpadateBranch = createAsyncThunk(
+  "branches/handleUpadateBranch",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.patch(`branches/${id}`, data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleSetRoleEmployees = createAsyncThunk(
+  "branches/handleSetRoleEmployees",
+  async ({ branchID, userID, role }, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.patch(
+        `branches/${branchID}/employees/${userID}/${role}`
+      );
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteRoleEmployees = createAsyncThunk(
+  "branches/handleDeleteRoleEmployees",
+  async ({ userID }, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.delete(`branches/employees/${userID}`);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetEmployeesBranch = createAsyncThunk(
+  "branches/handleGetEmployeesBranch",
+  async (id) => {
+    const response = await GuestRequest.get(`branches/${id}/employees`, {
+      params: {
+        id: id,
+      },
+    });
+    return Array.isArray(response.data) ? response.data : [];
+  }
+);
+
 const initialState = {
   branch: [],
   branches: [],
@@ -145,117 +256,6 @@ const branchesSlice = createSlice({
     });
   },
 });
-
-export const handleGetBranches = createAsyncThunk(
-  "branches/handleGetBranches",
-  async () => {
-    const response = await GuestRequest.get("branches");
-    return { data: response.data };
-  }
-);
-
-export const handleGetThisBranches = createAsyncThunk(
-  "branches/handleGetThisBranches",
-  async () => {
-    const response = await AuthRequest.get("branches/this-branches");
-    return response.data;
-  }
-);
-
-export const handleGetBranch = createAsyncThunk(
-  "branches/handleGetBranch",
-  async (id) => {
-    const response = await GuestRequest.get("branches", {
-      params: {
-        id: id,
-      },
-    });
-    return { data: response.data };
-  }
-);
-
-export const handleCreateBranch = createAsyncThunk(
-  "branches/handleCreateBranch",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.post("branches", data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteBranch = createAsyncThunk(
-  "branches/handleDeleteBranch",
-  async ({ id, ids }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.delete("branches", {
-        data: {
-          ids: ids,
-          id: id,
-        },
-      });
-      return { data: response.data };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpadateBranch = createAsyncThunk(
-  "branches/handleUpadateBranch",
-  async ({ id, ...data }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.patch(`branches/${id}`, data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleSetRoleEmployees = createAsyncThunk(
-  "branches/handleSetRoleEmployees",
-  async ({ branchID, userID, role }, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.patch(
-        `branches/${branchID}/employees/${userID}/${role}`
-      );
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteRoleEmployees = createAsyncThunk(
-  "branches/handleDeleteRoleEmployees",
-  async ({ userID }, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.delete(`branches/employees/${userID}`);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleGetEmployeesBranch = createAsyncThunk(
-  "branches/handleGetEmployeesBranch",
-  async (id) => {
-    const response = await GuestRequest.get(`branches/${id}/employees`, {
-      params: {
-        id: id,
-      },
-    });
-    return Array.isArray(response.data) ? response.data : [];
-  }
-);
 
 export const branchesSelector = (store) => store.branches;
 export const branchesReducer = branchesSlice.reducer;

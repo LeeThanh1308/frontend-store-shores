@@ -3,6 +3,71 @@ import GuestRequest from "@/services/axios/GuestRequest";
 import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
+export const handleGetWhereComments = createAsyncThunk(
+  "comments/handleGetWhereComments",
+  async (data = {}) => {
+    const response = await GuestRequest.get("comments", {
+      params: data,
+    });
+    return response.data;
+  }
+);
+
+export const handleCreateComment = createAsyncThunk(
+  "comments/handleCreateComment",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.post("comments", data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleCreateReplyComment = createAsyncThunk(
+  "comments/handleCreateReplyComment",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.post("replies", data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleDeleteComment = createAsyncThunk(
+  "comments/handleDeleteComment",
+  async ({ id, ids }, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.delete("comments", {
+        data: {
+          ids: ids,
+          id: id,
+        },
+      });
+      return { data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleUpdateComment = createAsyncThunk(
+  "comments/handleUpdateComment",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.patch(`comments/${id}`, data);
+      return { data: response.data };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 
 const initialState = {
   comments: [],
@@ -82,72 +147,6 @@ const commentsSlice = createSlice({
     });
   },
 });
-
-export const handleGetWhereComments = createAsyncThunk(
-  "comments/handleGetWhereComments",
-  async (data = {}) => {
-    const response = await GuestRequest.get("comments", {
-      params: data,
-    });
-    return response.data;
-  }
-);
-
-export const handleCreateComment = createAsyncThunk(
-  "comments/handleCreateComment",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.post("comments", data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleCreateReplyComment = createAsyncThunk(
-  "comments/handleCreateReplyComment",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.post("replies", data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleDeleteComment = createAsyncThunk(
-  "comments/handleDeleteComment",
-  async ({ id, ids }, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.delete("comments", {
-        data: {
-          ids: ids,
-          id: id,
-        },
-      });
-      return { data: response.data };
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleUpdateComment = createAsyncThunk(
-  "comments/handleUpdateComment",
-  async ({ id, ...data }, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.patch(`comments/${id}`, data);
-      return { data: response.data };
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const commentsSelector = (store) => store.comments;
 export const commentsReducer = commentsSlice.reducer;

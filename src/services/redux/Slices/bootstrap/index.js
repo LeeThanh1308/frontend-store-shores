@@ -1,7 +1,71 @@
 import GuestRequest from "@/services/axios/GuestRequest";
-import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
+
+export const handleGetBootstrapBrands = createAsyncThunk(
+  "bootstrap/handleGetBrands",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.get("product-brands");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetBootstrapCategories = createAsyncThunk(
+  "bootstrap/handleGetCategories",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.get("categories");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetBootstrapTargetGroups = createAsyncThunk(
+  "bootstrap/handleGetBootstrapTargetGroups",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.get("target-groups");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetTrendingProducts = createAsyncThunk(
+  "bootstrap/handleGetTrendingProducts",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.get("products/trendings");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetProductBrands = createAsyncThunk(
+  "bootstrap/handleGetProductBrands",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.get("products/brands");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 
 const initialState = {
   brands: [],
@@ -103,71 +167,6 @@ const bootstrapSlice = createSlice({
     //#################################################################
   },
 });
-
-export const handleGetBootstrapBrands = createAsyncThunk(
-  "bootstrap/handleGetBrands",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.get("product-brands");
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleGetBootstrapCategories = createAsyncThunk(
-  "bootstrap/handleGetCategories",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.get("categories");
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleGetBootstrapTargetGroups = createAsyncThunk(
-  "bootstrap/handleGetBootstrapTargetGroups",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.get("target-groups");
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleGetTrendingProducts = createAsyncThunk(
-  "bootstrap/handleGetTrendingProducts",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.get("products/trendings");
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleGetProductBrands = createAsyncThunk(
-  "bootstrap/handleGetProductBrands",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.get("products/brands");
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const { handleChangeLoadingApp } = bootstrapSlice.actions;
 export const bootstrapSelector = (store) => store.bootstrap;

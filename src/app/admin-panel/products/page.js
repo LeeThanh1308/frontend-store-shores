@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Modal, Space, Table } from "antd";
+import { Button, Modal } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import {
   formatCurrencyVND,
@@ -12,7 +12,6 @@ import {
 import {
   handleChangeLoading,
   handleCreateProduct,
-  handleDeleteProduct,
   handleGetProducts,
   handleUpdateProduct,
   productsSelector,

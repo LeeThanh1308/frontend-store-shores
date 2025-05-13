@@ -1,10 +1,29 @@
 import AuthRequest from "@/services/axios/AuthRequest";
-import GuestRequest from "@/services/axios/GuestRequest";
 import Toastify from "@/components/sections/Toastify";
-import { data } from "autoprefixer";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
+export const handleGetAdminOrders = createAsyncThunk(
+  "orders/handleGetAdminOrders",
+  async (data = {}) => {
+    const response = await AuthRequest.get("payment/admin/orders", {
+      params: data,
+    });
+    return response.data;
+  }
+);
 
+export const handleUpdatedAdminOrders = createAsyncThunk(
+  "orders/handleUpdatedAdminOrders",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AuthRequest.patch(`payment/admin/orders`, data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 const initialState = {
   orders: [],
   ordersWhere: [],
@@ -50,29 +69,6 @@ const ordersSlice = createSlice({
     });
   },
 });
-
-export const handleGetAdminOrders = createAsyncThunk(
-  "orders/handleGetAdminOrders",
-  async (data = {}) => {
-    const response = await AuthRequest.get("payment/admin/orders", {
-      params: data,
-    });
-    return response.data;
-  }
-);
-
-export const handleUpdatedAdminOrders = createAsyncThunk(
-  "orders/handleUpdatedAdminOrders",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await AuthRequest.patch(`payment/admin/orders`, data);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
 
 export const { handlePushOrders } = ordersSlice.actions;
 export const ordersSelector = (store) => store.orders;

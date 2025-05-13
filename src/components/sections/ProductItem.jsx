@@ -17,7 +17,7 @@ function ProductItem({
   return (
     <div
       key={key}
-      className="font-dancing-script flex flex-col text-rose-500 text-xl rounded-xl bg-white shadow-md hover:shadow-lg shadow-black/25 transition-shadow space-y-2 relative overflow-hidden"
+      className="font-dancing-script flex flex-col text-rose-500 text-xl rounded-xl bg-white shadow-md hover:shadow-lg shadow-black/25 transition-shadow space-y-2 relative mb:rounded-sm overflow-hidden"
       {...props}
     >
       {Number(data?.discount) > 0 && (

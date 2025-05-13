@@ -16,7 +16,46 @@ import Toastify from "@/components/sections/Toastify";
 import { handleForgotPassword } from "./forgotPasswordApi";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
+export const handleRefreshOtpCode = createAsyncThunk(
+  "auth/handleRefreshOtpCode",
+  async (ID, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.get("verifications/refresh/" + ID);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
 
+export const handleVerifyOtpCode = createAsyncThunk(
+  "auth/handleVerifyOtpCode",
+  async ({ id, code, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await GuestRequest.post(
+        `verifications/accounts/${id}/${code}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Request failed");
+    }
+  }
+);
+
+export const handleGetInfoUser = createAsyncThunk(
+  "auth/handleGetInfoUser",
+  async () => {
+    async (data, { rejectWithValue }) => {
+      try {
+        const response = await AuthRequest.post(`verifications/accounts/info`);
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response?.data || "Request failed");
+      }
+    };
+  }
+);
 const initialState = {
   user: {},
   role: undefined,
@@ -251,47 +290,6 @@ const authSlice = createSlice({
     //#################################################################
   },
 });
-
-export const handleRefreshOtpCode = createAsyncThunk(
-  "auth/handleRefreshOtpCode",
-  async (ID, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.get("verifications/refresh/" + ID);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleVerifyOtpCode = createAsyncThunk(
-  "auth/handleVerifyOtpCode",
-  async ({ id, code, ...data }, { rejectWithValue }) => {
-    try {
-      const response = await GuestRequest.post(
-        `verifications/accounts/${id}/${code}`,
-        data
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Request failed");
-    }
-  }
-);
-
-export const handleGetInfoUser = createAsyncThunk(
-  "auth/handleGetInfoUser",
-  async () => {
-    async (data, { rejectWithValue }) => {
-      try {
-        const response = await AuthRequest.post(`verifications/accounts/info`);
-        return response.data;
-      } catch (error) {
-        return rejectWithValue(error.response?.data || "Request failed");
-      }
-    };
-  }
-);
 
 export const {
   handleChangeStateActiveVerify,

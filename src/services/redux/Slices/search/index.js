@@ -3,6 +3,21 @@ import Toastify from "@/components/sections/Toastify";
 
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
+export const handleGetSearch = createAsyncThunk(
+  "search/handleGetSearch",
+  async (data) => {
+    const response = await GuestRequest.post(`products/search`, data);
+    return { data: response.data };
+  }
+);
+
+export const handleGetSearchFilter = createAsyncThunk(
+  "search/handleGetSearchFilter",
+  async (data) => {
+    const response = await GuestRequest.post(`products/search`, data);
+    return { data: response.data };
+  }
+);
 const initialState = {
   search: {
     products: [],
@@ -47,22 +62,6 @@ const searchSlice = createSlice({
     });
   },
 });
-
-export const handleGetSearch = createAsyncThunk(
-  "search/handleGetSearch",
-  async (data) => {
-    const response = await GuestRequest.post(`products/search`, data);
-    return { data: response.data };
-  }
-);
-
-export const handleGetSearchFilter = createAsyncThunk(
-  "search/handleGetSearchFilter",
-  async (data) => {
-    const response = await GuestRequest.post(`products/search`, data);
-    return { data: response.data };
-  }
-);
 
 export const searchSelector = (store) => store.search;
 export const searchReducer = searchSlice.reducer;
